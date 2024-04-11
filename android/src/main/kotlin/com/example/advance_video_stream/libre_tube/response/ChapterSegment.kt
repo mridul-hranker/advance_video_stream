@@ -1,3 +1,5 @@
+package com.example.advance_video_stream.libre_tube.response
+
 import android.graphics.drawable.Drawable
 
 data class ChapterSegment(

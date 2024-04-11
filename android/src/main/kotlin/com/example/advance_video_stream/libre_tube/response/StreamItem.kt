@@ -1,4 +1,4 @@
-data class StreamItem(
+package com.example.advance_video_stream.libre_tube.responsedata class StreamItem(
     val url: String? = null,
     val type: String? = null,
     var title: String? = null,

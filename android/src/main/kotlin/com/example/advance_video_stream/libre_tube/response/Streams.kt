@@ -1,10 +1,9 @@
-package com.example.advance_video_stream.libre_tube
+package com.example.advance_video_stream.libre_tube.response
 
-import ChapterSegment
-import MetaInfo
-import PipedStream
-import PreviewFrames
-import StreamItem
+import com.example.advance_video_stream.libre_tube.responsedata.MetaInfo
+import com.example.advance_video_stream.libre_tube.responsedata.PipedStream
+import com.example.advance_video_stream.libre_tube.responsedata.PreviewFrames
+import com.example.advance_video_stream.libre_tube.responsedata.StreamItem
 import java.time.Instant
 
 data class Streams(
@@ -40,8 +39,8 @@ data class Streams(
 ) {
 
 
-    /*fun toStreamItem(videoId: String): StreamItem {
-        return StreamItem(
+    /*fun toStreamItem(videoId: String): com.example.advance_video_stream.libre_tube.response.StreamItem {
+        return com.example.advance_video_stream.libre_tube.response.StreamItem(
             url = videoId,
             title = title,
             thumbnail = thumbnailUrl,

@@ -1,0 +1,7 @@
+<com.example.advance_video_stream.view.CustomPlayerView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/custom_player_view"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    app:controller_layout_id="@layout/exo_styled_player_control_view"
+    app:show_buffering="when_playing"/>

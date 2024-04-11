@@ -7,9 +7,9 @@ import android.util.Log
 import androidx.annotation.NonNull
 import androidx.media3.common.MediaItem
 import androidx.media3.exoplayer.ExoPlayer
-import com.example.advance_video_stream.libre_tube.DashHelper
+import com.example.advance_video_stream.libre_tube.dash.DashHelper
 
-import com.example.advance_video_stream.libre_tube.Streams
+import com.example.advance_video_stream.libre_tube.response.Streams
 import com.example.advance_video_stream.libre_tube.setMetadata
 import com.example.advance_video_stream.view.NativeViewFactory
 import com.example.advance_video_stream.viewModel.VideoDataVM

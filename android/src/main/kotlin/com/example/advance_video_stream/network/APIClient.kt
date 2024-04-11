@@ -1,6 +1,6 @@
 package com.example.advance_video_stream.network
 
-import com.example.advance_video_stream.libre_tube.Streams
+import com.example.advance_video_stream.libre_tube.response.Streams
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Headers

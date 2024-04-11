@@ -1,7 +1,7 @@
 package com.example.advance_video_stream.repo
 
 import android.util.Log
-import com.example.advance_video_stream.libre_tube.Streams
+import com.example.advance_video_stream.libre_tube.response.Streams
 import com.example.advance_video_stream.network.APIClient
 import com.example.advance_video_stream.network.RetrofitManager
 import kotlinx.coroutines.CoroutineScope

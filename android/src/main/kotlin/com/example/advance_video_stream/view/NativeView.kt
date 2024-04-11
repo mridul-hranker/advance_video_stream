@@ -4,19 +4,30 @@ import android.content.Context
 import android.net.Uri
 import android.util.Base64
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
+import android.widget.LinearLayout
+import com.example.advance_video_stream.view.CustomPlayerView
 import androidx.annotation.OptIn
+import androidx.media3.common.AudioAttributes
 import androidx.media3.common.MediaItem
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.datasource.DefaultDataSource
 import androidx.media3.datasource.cronet.CronetDataSource
 import androidx.media3.exoplayer.DefaultLoadControl
+import androidx.media3.common.C
+import androidx.media3.common.MimeTypes
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.LoadControl
+import androidx.media3.exoplayer.hls.HlsMediaSource
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
+import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import androidx.media3.ui.PlayerView
-import com.example.advance_video_stream.libre_tube.DashHelper
-import com.example.advance_video_stream.libre_tube.Streams
+import com.example.advance_video_stream.R
+import com.example.advance_video_stream.libre_tube.ProxyHelper
+import com.example.advance_video_stream.libre_tube.dash.DashHelper
+import com.example.advance_video_stream.libre_tube.hls.YoutubeHlsPlaylistParser
+import com.example.advance_video_stream.libre_tube.response.Streams
 import com.example.advance_video_stream.libre_tube.setMetadata
 import com.example.advance_video_stream.network.CronetHelper
 import com.example.advance_video_stream.viewModel.VideoDataVM
@@ -31,7 +42,7 @@ import java.util.concurrent.Executors
 internal class NativeView(context: Context, id: Int, creationParams: Map<String?, Any?>?) : PlatformView {
     private val TAG = "NativeView"
 
-    private val playerView: PlayerView
+    private val playerView: CustomPlayerView
     private val exoPlayer: ExoPlayer
 
     override fun getView(): View {
@@ -39,8 +50,8 @@ internal class NativeView(context: Context, id: Int, creationParams: Map<String?
     }
 
     init {
-        playerView = PlayerView(context)
 
+        playerView = LayoutInflater.from(context).inflate(R.layout.custom_exo_player, null) as CustomPlayerView
 
         val cronetDataSourceFactory = CronetDataSource.Factory(
             CronetHelper.cronetEngine,
@@ -48,8 +59,20 @@ internal class NativeView(context: Context, id: Int, creationParams: Map<String?
         )
         val dataSourceFactory = DefaultDataSource.Factory(context, cronetDataSourceFactory)
 
-        exoPlayer = ExoPlayer.Builder(context).setMediaSourceFactory(DefaultMediaSourceFactory(dataSourceFactory)).setLoadControl(getLoadControl()).build()
+        val audioAttributes = AudioAttributes.Builder()
+            .setUsage(C.USAGE_MEDIA)
+            .setContentType(C.AUDIO_CONTENT_TYPE_MOVIE)
+            .build()
+
+        exoPlayer = ExoPlayer.Builder(context)
+            .setMediaSourceFactory(DefaultMediaSourceFactory(dataSourceFactory))
+            .setTrackSelector(DefaultTrackSelector(context))
+            .setAudioAttributes(audioAttributes, false)
+            .setLoadControl(getLoadControl()).build()
+
         playerView.player = exoPlayer
+//        exoPlayer.setVideoSurface()
+
 
         CoroutineScope(Dispatchers.IO).launch {
             val streams: Streams? = VideoDataVM().getData("3UJ_mERvw3A")
@@ -66,30 +89,54 @@ internal class NativeView(context: Context, id: Int, creationParams: Map<String?
 
 
     //Player vars
-    lateinit var uri: Uri
-    lateinit var mimeType: String
     lateinit var streams: Streams
     private val MINIMUM_BUFFER_DURATION = 1000 * 10 // exo default is 50s
 
-    private fun updatePlayerItem() {
+    private fun updatePlayerItem(useDash: Boolean = false) {
 
-        val manifest: String = DashHelper.createManifest(streams, false)
+        if (useDash) {
 
-        // encode to base64
-        val encoded = Base64.encodeToString(manifest.toByteArray(), Base64.DEFAULT)
-        uri = Uri.parse("data:application/dash+xml;charset=utf-8;base64,$encoded")
+            val manifest: String = DashHelper.createManifest(streams, false)
 
-        mimeType = "application/dash+xml"
+            // encode to base64
+            val encoded = Base64.encodeToString(manifest.toByteArray(), Base64.DEFAULT)
+            val uri: Uri = Uri.parse("data:application/dash+xml;charset=utf-8;base64,$encoded")
 
-        val mediaItem = MediaItem.Builder()
-            .setUri(uri)
-            .setMimeType(mimeType)
-            .setMetadata(streams)
-            .build()
+            val mimeType: String = "application/dash+xml"
 
-        MainScope().launch {
-            exoPlayer.setMediaItem(mediaItem)
-            exoPlayer.play()
+            val mediaItem = MediaItem.Builder()
+                .setUri(uri)
+                .setMimeType(mimeType)
+                .setMetadata(streams)
+                .build()
+
+            MainScope().launch {
+                exoPlayer.setMediaItem(mediaItem)
+                exoPlayer.play()
+            }
+        } else {
+            //HLS
+            val cronetDataSourceFactory = CronetDataSource.Factory(
+                CronetHelper.cronetEngine,
+                Executors.newCachedThreadPool()
+            )
+
+            val hlsMediaSourceFactory = HlsMediaSource.Factory(cronetDataSourceFactory).setPlaylistParserFactory(YoutubeHlsPlaylistParser.Factory())
+
+            val mediaSource = hlsMediaSourceFactory.createMediaSource(
+                MediaItem.Builder()
+                    .setUri(Uri.parse(ProxyHelper.unwrapStreamUrl(streams.hls!!)))
+                    .setMimeType("application/x-mpegURL")
+                    .setMetadata(streams)
+                    .build()
+            )
+
+            MainScope().launch {
+                exoPlayer.setMediaSource(mediaSource)
+                exoPlayer.prepare()
+                exoPlayer.playWhenReady = true
+            }
+
         }
     }
 
