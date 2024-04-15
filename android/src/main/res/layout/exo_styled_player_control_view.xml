@@ -9,34 +9,118 @@
         android:layout_height="0dp"
         android:background="@color/exo_black_opacity_60" />
 
+    <!--  Top bar  -->
+
     <LinearLayout
         android:id="@+id/top_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="top"
         android:animateLayoutChanges="true"
-        android:orientation="vertical"
+        android:gravity="end"
+        android:orientation="horizontal"
         android:paddingHorizontal="5dp"
         android:paddingTop="5dp">
 
+        <Spinner
+            android:id="@+id/spinner_speed"
+            android:layout_width="75dp"
+            android:layout_height="34dp"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/dropdown_background"
+            android:paddingStart="4dp"
+            android:spinnerMode="dialog"
+            tools:listitem="@layout/dropdown_item" />
 
-        <LinearLayout
-            android:id="@+id/exo_top_bar_right"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+        <Spinner
+            android:id="@+id/spinner_quality"
+            android:layout_width="80dp"
+            android:layout_height="34dp"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/dropdown_background"
+            android:paddingStart="8dp"
+            android:spinnerMode="dialog"
+            tools:listitem="@layout/dropdown_item" />
+
+        <ImageButton
+            android:id="@+id/toggle_resize"
+            style="@style/PlayerControlTop"
             android:layout_gravity="end"
-            android:layoutDirection="ltr">
-
-            <ImageButton
-                android:id="@+id/toggle_options"
-                style="@style/PlayerControlTop"
-                android:src="@drawable/ic_player_settings"
-                android:tooltipText="@string/tooltip_options" />
-
-
-        </LinearLayout>
+            android:importantForAccessibility="no"
+            android:src="@drawable/ic_aspect_ratio"
+            android:tooltipText="@string/tooltip_options" />
 
     </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@id/exo_center_controls"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@android:color/transparent"
+        android:gravity="center"
+        android:padding="20dp">
+
+        <FrameLayout
+            android:id="@+id/rewindBTN"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginHorizontal="10dp"
+            android:background="@android:color/transparent"
+            android:scaleX="0.8"
+            android:scaleY="0.8">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_rewind" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="10"
+                android:textColor="@android:color/white" />
+
+        </FrameLayout>
+
+        <ImageButton
+            android:id="@+id/playPauseBTN"
+            style="@style/ExoStyledControls.Button.Center.PlayPause"
+            android:layout_marginHorizontal="10dp"
+            android:background="?android:selectableItemBackgroundBorderless"
+            android:importantForAccessibility="no" />
+
+        <FrameLayout
+            android:id="@+id/forwardBTN"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginHorizontal="10dp"
+            android:background="@android:color/transparent"
+            android:scaleX="0.8"
+            android:scaleY="0.8">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_forward" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="10"
+                android:textColor="@android:color/white" />
+
+        </FrameLayout>
+
+    </LinearLayout>
+
+    <!--  Bottom bar  -->
 
     <LinearLayout
         android:id="@+id/bottom_bar"

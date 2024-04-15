@@ -6,8 +6,6 @@ import android.util.Base64
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
-import android.widget.LinearLayout
-import com.example.advance_video_stream.view.CustomPlayerView
 import androidx.annotation.OptIn
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.MediaItem
@@ -16,13 +14,11 @@ import androidx.media3.datasource.DefaultDataSource
 import androidx.media3.datasource.cronet.CronetDataSource
 import androidx.media3.exoplayer.DefaultLoadControl
 import androidx.media3.common.C
-import androidx.media3.common.MimeTypes
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.LoadControl
 import androidx.media3.exoplayer.hls.HlsMediaSource
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
-import androidx.media3.ui.PlayerView
 import com.example.advance_video_stream.R
 import com.example.advance_video_stream.libre_tube.ProxyHelper
 import com.example.advance_video_stream.libre_tube.dash.DashHelper
@@ -30,7 +26,7 @@ import com.example.advance_video_stream.libre_tube.hls.YoutubeHlsPlaylistParser
 import com.example.advance_video_stream.libre_tube.response.Streams
 import com.example.advance_video_stream.libre_tube.setMetadata
 import com.example.advance_video_stream.network.CronetHelper
-import com.example.advance_video_stream.viewModel.VideoDataVM
+import com.example.advance_video_stream.view_model.VideoDataVM
 import io.flutter.plugin.platform.PlatformView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -39,24 +35,18 @@ import kotlinx.coroutines.launch
 import java.util.concurrent.Executors
 
 @OptIn(UnstableApi::class)
-internal class NativeView(context: Context, id: Int, creationParams: Map<String?, Any?>?) : PlatformView {
+class NativeView(context: Context, id: Int, creationParams: Map<String?, Any?>?) : PlatformView {
     private val TAG = "NativeView"
 
     private val playerView: CustomPlayerView
     private val exoPlayer: ExoPlayer
 
-    override fun getView(): View {
-        return playerView
-    }
+    override fun getView(): View = playerView
 
     init {
-
         playerView = LayoutInflater.from(context).inflate(R.layout.custom_exo_player, null) as CustomPlayerView
 
-        val cronetDataSourceFactory = CronetDataSource.Factory(
-            CronetHelper.cronetEngine,
-            Executors.newCachedThreadPool()
-        )
+        val cronetDataSourceFactory = CronetDataSource.Factory(CronetHelper.cronetEngine, Executors.newCachedThreadPool())
         val dataSourceFactory = DefaultDataSource.Factory(context, cronetDataSourceFactory)
 
         val audioAttributes = AudioAttributes.Builder()
@@ -71,72 +61,70 @@ internal class NativeView(context: Context, id: Int, creationParams: Map<String?
             .setLoadControl(getLoadControl()).build()
 
         playerView.player = exoPlayer
-//        exoPlayer.setVideoSurface()
-
-
-        CoroutineScope(Dispatchers.IO).launch {
-            val streams: Streams? = VideoDataVM().getData("3UJ_mERvw3A")
-            if (streams != null) {
-                this@NativeView.streams = streams
-                updatePlayerItem()
-            } else {
-                Log.d(TAG, "createExoPlayer: CoroutineScope VideoDataVM().getData is null")
-            }
-        }
     }
 
-    override fun dispose() {}
+    override fun dispose() {
+        exoPlayer.stop()
+        exoPlayer.release()
+        android.util.Log.d(TAG, "dispose: called")
+    }
 
 
     //Player vars
-    lateinit var streams: Streams
     private val MINIMUM_BUFFER_DURATION = 1000 * 10 // exo default is 50s
 
-    private fun updatePlayerItem(useDash: Boolean = false) {
+    fun updatePlayerItem(videoId: String, useHLS: Boolean = false) {
+        CoroutineScope(Dispatchers.IO).launch {
+            val streams: Streams? = VideoDataVM().getData(videoId)
+            if (streams != null) {
 
-        if (useDash) {
+                if (!useHLS) {
+                    val manifest: String = DashHelper.createManifest(streams, false)
 
-            val manifest: String = DashHelper.createManifest(streams, false)
+                    // encode to base64
+                    val encoded = Base64.encodeToString(manifest.toByteArray(), Base64.DEFAULT)
+                    val uri: Uri = Uri.parse("data:application/dash+xml;charset=utf-8;base64,$encoded")
 
-            // encode to base64
-            val encoded = Base64.encodeToString(manifest.toByteArray(), Base64.DEFAULT)
-            val uri: Uri = Uri.parse("data:application/dash+xml;charset=utf-8;base64,$encoded")
+                    val mediaItem = MediaItem.Builder()
+                        .setUri(uri)
+                        .setMimeType("application/dash+xml")
+                        .setMetadata(streams)
+                        .build()
 
-            val mimeType: String = "application/dash+xml"
+                    MainScope().launch {
+                        exoPlayer.setMediaItem(mediaItem)
+                        exoPlayer.prepare()
+                        playerView.initialize(false, exoPlayer)
+                        exoPlayer.playWhenReady = true
+                    }
+                } else {
+                    //HLS
+                    val cronetDataSourceFactory = CronetDataSource.Factory(
+                        CronetHelper.cronetEngine,
+                        Executors.newCachedThreadPool()
+                    )
 
-            val mediaItem = MediaItem.Builder()
-                .setUri(uri)
-                .setMimeType(mimeType)
-                .setMetadata(streams)
-                .build()
+                    val hlsMediaSourceFactory = HlsMediaSource.Factory(cronetDataSourceFactory).setPlaylistParserFactory(YoutubeHlsPlaylistParser.Factory())
 
-            MainScope().launch {
-                exoPlayer.setMediaItem(mediaItem)
-                exoPlayer.play()
+                    val mediaSource = hlsMediaSourceFactory.createMediaSource(
+                        MediaItem.Builder()
+                            .setUri(Uri.parse(ProxyHelper.unwrapStreamUrl(streams.hls!!)))
+                            .setMimeType("application/x-mpegURL")
+                            .setMetadata(streams)
+                            .build()
+                    )
+
+                    MainScope().launch {
+                        exoPlayer.setMediaSource(mediaSource)
+                        exoPlayer.prepare()
+                        playerView.initialize(false, exoPlayer)
+                        exoPlayer.playWhenReady = true
+                    }
+
+                }
+            } else {
+                Log.d(TAG, "createExoPlayer: CoroutineScope VideoDataVM().getData is null")
             }
-        } else {
-            //HLS
-            val cronetDataSourceFactory = CronetDataSource.Factory(
-                CronetHelper.cronetEngine,
-                Executors.newCachedThreadPool()
-            )
-
-            val hlsMediaSourceFactory = HlsMediaSource.Factory(cronetDataSourceFactory).setPlaylistParserFactory(YoutubeHlsPlaylistParser.Factory())
-
-            val mediaSource = hlsMediaSourceFactory.createMediaSource(
-                MediaItem.Builder()
-                    .setUri(Uri.parse(ProxyHelper.unwrapStreamUrl(streams.hls!!)))
-                    .setMimeType("application/x-mpegURL")
-                    .setMetadata(streams)
-                    .build()
-            )
-
-            MainScope().launch {
-                exoPlayer.setMediaSource(mediaSource)
-                exoPlayer.prepare()
-                exoPlayer.playWhenReady = true
-            }
-
         }
     }
 

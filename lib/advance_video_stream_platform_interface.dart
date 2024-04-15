@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/widgets.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
@@ -24,19 +26,11 @@ abstract class AdvanceVideoStreamPlatform extends PlatformInterface {
     _instance = instance;
   }
 
-  Future<String?> getPlatformVersion() {
-    throw UnimplementedError('platformVersion() has not been implemented.');
+  Future<void> setVideoData(String videoId, bool useHLS) {
+    throw UnimplementedError('setVideoData(String videoId, bool useHLS) has not been implemented.');
   }
 
-  Future<String?> setVideoData() {
-    throw UnimplementedError('setVideoData() has not been implemented.');
-  }
-
-  Future<String?> createPlayer() {
-    throw UnimplementedError('createPlayer() has not been implemented.');
-  }
-
-  PlatformViewLink player() {
+  AdvancePlayer player(double aspectRatio, double? height) {
     throw UnimplementedError('player() has not been implemented.');
   }
 }

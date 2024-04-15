@@ -1,4 +1,4 @@
-package com.example.advance_video_stream.viewModel
+package com.example.advance_video_stream.view_model
 
 import com.example.advance_video_stream.libre_tube.response.Streams
 import com.example.advance_video_stream.repo.VideoDataRepo

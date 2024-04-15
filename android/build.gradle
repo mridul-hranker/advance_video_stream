@@ -60,11 +60,12 @@ android {
         implementation "androidx.media3:media3-exoplayer-smoothstreaming:$exoplayer_version"
         implementation "androidx.media3:media3-datasource-cronet:$exoplayer_version"
 
-
+        //Retrofit
         implementation "com.squareup.retrofit2:retrofit:${retrofit_version}"
         implementation "com.squareup.retrofit2:converter-gson:${retrofit_version}"
         implementation 'com.squareup.okhttp3:logging-interceptor:4.11.0'
 
+        //Cronet
         implementation 'org.chromium.net:cronet-embedded:119.6045.31'
         implementation 'com.google.net.cronet:cronet-okhttp:0.1.0'
 
@@ -72,6 +73,7 @@ android {
         implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutine_version"
         implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutine_version"
 
+        implementation 'com.google.android.material:material:1.11.0'
 
         testImplementation 'org.jetbrains.kotlin:kotlin-test'
         testImplementation 'org.mockito:mockito-core:5.0.0'

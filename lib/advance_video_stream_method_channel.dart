@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 
@@ -13,42 +13,50 @@ class MethodChannelAdvanceVideoStream extends AdvanceVideoStreamPlatform {
   final methodChannel = const MethodChannel('advance_video_stream');
 
   @override
-  Future<String?> getPlatformVersion() async {
-    final version = await methodChannel.invokeMethod<String>('getPlatformVersion');
-    return version;
+  Future<void> setVideoData(String videoId, bool useHLS) async {
+    await methodChannel.invokeMethod<String>('setVideoData', {"videoId": videoId, "useHLS": useHLS});
   }
 
   @override
-  Future<String?> setVideoData() async {
-    final version = await methodChannel.invokeMethod<String>('setVideoData');
-    return version;
+  AdvancePlayer player(double aspectRatio, double? height) {
+    return AdvancePlayer(methodChannel: methodChannel, aspectRatio: aspectRatio, height: height);
   }
+}
+
+class AdvancePlayer extends StatelessWidget {
+  final MethodChannel methodChannel;
+  final double aspectRatio;
+  final double? height;
+
+  const AdvancePlayer({super.key, required this.methodChannel, required this.aspectRatio, this.height});
 
   @override
-  Future<String?> createPlayer() async {
-    final version = await methodChannel.invokeMethod<String>('createPlayer');
-    return version;
-  }
-
-  @override
-  PlatformViewLink player() {
-    return PlatformViewLink(
-      viewType: 'ExoPlayer',
-      surfaceFactory: (context, controller) => AndroidViewSurface(
-        controller: controller as AndroidViewController,
-        hitTestBehavior: PlatformViewHitTestBehavior.opaque,
-        gestureRecognizers: const <Factory<OneSequenceGestureRecognizer>>{},
+  Widget build(BuildContext context) {
+    return Material(
+      child: SizedBox(
+        height: height,
+        child: AspectRatio(
+          aspectRatio: aspectRatio,
+          child: PlatformViewLink(
+            viewType: 'ExoPlayer',
+            surfaceFactory: (context, controller) => AndroidViewSurface(
+              controller: controller as AndroidViewController,
+              hitTestBehavior: PlatformViewHitTestBehavior.opaque,
+              gestureRecognizers: const <Factory<OneSequenceGestureRecognizer>>{},
+            ),
+            onCreatePlatformView: (PlatformViewCreationParams params) {
+              return PlatformViewsService.initSurfaceAndroidView(
+                id: params.id,
+                viewType: params.viewType,
+                layoutDirection: TextDirection.ltr,
+                onFocus: () => params.onFocusChanged(true),
+              )
+                ..addOnPlatformViewCreatedListener(params.onPlatformViewCreated)
+                ..create();
+            },
+          ),
+        ),
       ),
-      onCreatePlatformView: (PlatformViewCreationParams params) {
-        return PlatformViewsService.initSurfaceAndroidView(
-          id: params.id,
-          viewType: params.viewType,
-          layoutDirection: TextDirection.ltr,
-          onFocus: () => params.onFocusChanged(true),
-        )
-          ..addOnPlatformViewCreatedListener(params.onPlatformViewCreated)
-          ..create();
-      },
     );
   }
 }

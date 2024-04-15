@@ -12,7 +12,7 @@ import com.example.advance_video_stream.libre_tube.dash.DashHelper
 import com.example.advance_video_stream.libre_tube.response.Streams
 import com.example.advance_video_stream.libre_tube.setMetadata
 import com.example.advance_video_stream.view.NativeViewFactory
-import com.example.advance_video_stream.viewModel.VideoDataVM
+import com.example.advance_video_stream.view_model.VideoDataVM
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.MethodCall
@@ -40,77 +40,46 @@ class AdvanceVideoStreamPlugin : FlutterPlugin, MethodCallHandler {
     /// when the Flutter Engine is detached from the Activity
     private lateinit var channel: MethodChannel
 
-
-    //Player vars
-    private lateinit var exoPlayer: ExoPlayer
-    lateinit var uri: Uri
-    lateinit var mimeType: String
-    lateinit var streams: Streams
+    val nativeViewFactory = NativeViewFactory()
 
     override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         channel = MethodChannel(flutterPluginBinding.binaryMessenger, "advance_video_stream")
         channel.setMethodCallHandler(this)
         context = flutterPluginBinding.applicationContext
 
-        flutterPluginBinding.platformViewRegistry.registerViewFactory("ExoPlayer", NativeViewFactory())
+        flutterPluginBinding.platformViewRegistry.registerViewFactory("ExoPlayer", nativeViewFactory)
 
     }
 
     override fun onMethodCall(call: MethodCall, result: Result) {
         if (call.method == "getPlatformVersion") {
             result.success("Android ${android.os.Build.VERSION.RELEASE}")
-        } else if (call.method == "createPlayer") {
-            Log.d(TAG, "onMethodCall: createPlayer")
-            createExoPlayer()
         } else if (call.method == "setVideoData") {
             Log.d(TAG, "onMethodCall: setVideoData")
+
+            val videoData = call.arguments as Map<*, *>
+
+            val videoId: String = videoData["videoId"] as String
+            val useHLS: Boolean = videoData["useHLS"] as Boolean
+
+            Log.d(TAG, "onMethodCall: setVideoData videoId ${videoData["videoId"]}")
+            Log.d(TAG, "onMethodCall: setVideoData useHLS ${videoData["useHLS"]}")
+
+            updatePlayerItem(videoId, useHLS)
         } else {
             result.notImplemented()
         }
     }
 
     override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
-        context = null
+//        context = null
+
+//        nativeViewFactory
+
         channel.setMethodCallHandler(null)
     }
 
-    private fun createExoPlayer() {
-        exoPlayer = ExoPlayer.Builder(context!!).build()
-        Log.d(TAG, "createExoPlayer: exoPlayer $exoPlayer")
-
-
-        CoroutineScope(Dispatchers.IO).launch {
-            val streams: Streams? = VideoDataVM().getData("3UJ_mERvw3A")
-            if (streams != null) {
-                this@AdvanceVideoStreamPlugin.streams = streams
-                updatePlayerItem()
-            } else {
-                Log.d(TAG, "createExoPlayer: CoroutineScope VideoDataVM().getData is null")
-            }
-        }
-
-    }
-
-    private fun updatePlayerItem() {
-
-        val manifest: String = DashHelper.createManifest(streams, false)
-
-        // encode to base64
-        val encoded = Base64.encodeToString(manifest.toByteArray(), Base64.DEFAULT)
-        uri = Uri.parse("data:application/dash+xml;charset=utf-8;base64,$encoded")
-
-        mimeType = "application/dash+xml"
-
-
-        val mediaItem = MediaItem.Builder()
-            .setUri(uri)
-            .setMimeType(mimeType)
-            .setMetadata(streams)
-            .build()
-
-        MainScope().launch {
-            exoPlayer.setMediaItem(mediaItem)
-            exoPlayer.play()
-        }
+    private fun updatePlayerItem(videoId: String, useHLS: Boolean = false) {
+        nativeViewFactory.updatePlayerItem(videoId, useHLS)
     }
 }

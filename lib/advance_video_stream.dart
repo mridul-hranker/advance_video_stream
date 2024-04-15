@@ -1,25 +1,12 @@
-import 'package:flutter/foundation.dart';
-import 'package:flutter/gestures.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter/material.dart';
-
+import 'advance_video_stream_method_channel.dart';
 import 'advance_video_stream_platform_interface.dart';
 
 class AdvanceVideoStream {
-  Future<String?> getPlatformVersion() {
-    return AdvanceVideoStreamPlatform.instance.getPlatformVersion();
+  Future<void> setVideoData({required String videoId, bool useHLS = false}) {
+    return AdvanceVideoStreamPlatform.instance.setVideoData(videoId, useHLS);
   }
 
-  Future<String?> setVideoData() {
-    return AdvanceVideoStreamPlatform.instance.setVideoData();
-  }
-
-  Future<String?> createPlayer() {
-    return AdvanceVideoStreamPlatform.instance.createPlayer();
-  }
-
-  PlatformViewLink player() {
-    return AdvanceVideoStreamPlatform.instance.player();
+  AdvancePlayer player({required double aspectRatio, double? height}) {
+    return AdvanceVideoStreamPlatform.instance.player(aspectRatio, height);
   }
 }
