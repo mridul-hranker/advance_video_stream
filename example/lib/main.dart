@@ -17,7 +17,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-
   @override
   void initState() {
     super.initState();
@@ -37,6 +36,8 @@ class MyColumn extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
         // Text('Running on: $_platformVersion\n'),
         ElevatedButton(
@@ -54,6 +55,11 @@ class MyColumn extends StatelessWidget {
               Navigator.push(context, MaterialPageRoute(builder: (context) => VideoPlayerScreen(videoId: "OIBODIPC_8Y")));
             },
             child: const Text('Yus.')),
+        ElevatedButton(
+            onPressed: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => VideoPlayerScreen(videoId: "jfKfPfyJRdk")));
+            },
+            child: const Text('Liv.')),
       ],
     );
   }

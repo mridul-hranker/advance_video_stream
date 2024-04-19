@@ -1,4 +1,9 @@
-package com.example.advance_video_stream.libre_tube.responsedata class StreamItem(
+package com.example.advance_video_stream.libre_tube.response
+
+import androidx.annotation.Keep
+
+@Keep
+data class StreamItem(
     val url: String? = null,
     val type: String? = null,
     var title: String? = null,
@@ -13,7 +18,7 @@ package com.example.advance_video_stream.libre_tube.responsedata class StreamIte
     val uploaded: Long = 0,
     val shortDescription: String? = null,
     val isShort: Boolean = false
-)  {
+) {
     val isLive get() = (duration != null) && (duration <= 0L)
 
 

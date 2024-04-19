@@ -1,5 +1,6 @@
 package com.example.advance_video_stream.libre_tube
 
+import androidx.annotation.Keep
 import com.example.advance_video_stream.network.CronetHelper
 import java.net.HttpURLConnection
 import java.net.URL
@@ -9,6 +10,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 
+@Keep
 object ProxyHelper {
 
     private const val disablePipedProxy: Boolean = true

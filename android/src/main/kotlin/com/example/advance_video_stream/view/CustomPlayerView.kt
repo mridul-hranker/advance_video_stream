@@ -29,7 +29,6 @@ import com.example.advance_video_stream.libre_tube.round
 import com.example.advance_video_stream.libre_tube.updateParameters
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
-//import com.example.advance_video_stream.view.GestureControl
 @UnstableApi
 class CustomPlayerView(context: Context, attrs: AttributeSet?) : PlayerView(context, attrs), AdapterView.OnItemSelectedListener {
     private val TAG = "CustomPlayerView"
@@ -42,6 +41,7 @@ class CustomPlayerView(context: Context, attrs: AttributeSet?) : PlayerView(cont
 
     private var spinnerQuality: Spinner = findViewById(R.id.spinner_quality)
     private var spinnerSpeed: Spinner = findViewById(R.id.spinner_speed)
+    val topBarTextVideoTitle: TextView = findViewById(R.id.top_bar_text_video_title)
 
     private val runnableHandler = Handler(Looper.getMainLooper())
 
@@ -54,7 +54,10 @@ class CustomPlayerView(context: Context, attrs: AttributeSet?) : PlayerView(cont
 
     fun initialize(isLive: Boolean = false, exoPlayer: ExoPlayer) {
         Log.d(TAG, "initialize: called")
-        this.isLive = isLive;
+        this.isLive = isLive
+        if (isLive) {
+            duration.visibility = View.GONE
+        }
 
         player?.addListener(object : Player.Listener {
             override fun onEvents(player: Player, events: Player.Events) {
@@ -93,7 +96,6 @@ class CustomPlayerView(context: Context, attrs: AttributeSet?) : PlayerView(cont
                 }
             }
         })
-
     }
 
     fun setVideoList(currentQuality: Int) {
@@ -212,40 +214,5 @@ class CustomPlayerView(context: Context, attrs: AttributeSet?) : PlayerView(cont
         TODO("Not yet implemented")
     }
 
-    /*open fun getOptionsMenuItems(): List<BottomSheetItem> = listOf(
-        BottomSheetItem(
-            context.getString(R.string.player_resize_mode),
-            R.drawable.ic_aspect_ratio,
-            {
-                when (resizeMode) {
-                    AspectRatioFrameLayout.RESIZE_MODE_FIT -> context.getString(
-                        R.string.resize_mode_fit
-                    )
 
-                    AspectRatioFrameLayout.RESIZE_MODE_FILL -> context.getString(
-                        R.string.resize_mode_fill
-                    )
-
-                    else -> context.getString(R.string.resize_mode_zoom)
-                }
-            }
-        ) {
-            onResizeModeClicked()
-        },
-        BottomSheetItem(
-            context.getString(R.string.playback_speed),
-            R.drawable.ic_speed,
-            {
-                "${player?.playbackParameters?.speed?.round(2)}x"
-            }
-        ) {
-            onPlaybackSpeedClicked()
-        },
-        BottomSheetItem(
-            context.getString(R.string.sleep_timer),
-            R.drawable.ic_sleep
-        ) {
-            onSleepTimerClicked()
-        }
-    )*/
 }

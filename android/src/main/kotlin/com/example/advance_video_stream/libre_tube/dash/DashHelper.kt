@@ -1,7 +1,8 @@
 package com.example.advance_video_stream.libre_tube.dash
 
+import androidx.annotation.Keep
 import com.example.advance_video_stream.libre_tube.response.Streams
-import com.example.advance_video_stream.libre_tube.responsedata.PipedStream
+import com.example.advance_video_stream.libre_tube.response.PipedStream
 import java.io.StringWriter
 import javax.xml.parsers.DocumentBuilderFactory
 import javax.xml.transform.TransformerFactory
@@ -12,6 +13,7 @@ import org.w3c.dom.Element
 
 // Based off of https://github.com/TeamPiped/Piped/blob/master/src/utils/DashUtils.js
 
+@Keep
 object DashHelper {
 
     private val builderFactory: DocumentBuilderFactory = DocumentBuilderFactory.newInstance()

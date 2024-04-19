@@ -1,11 +1,11 @@
 package com.example.advance_video_stream.libre_tube.response
 
-import com.example.advance_video_stream.libre_tube.responsedata.MetaInfo
-import com.example.advance_video_stream.libre_tube.responsedata.PipedStream
-import com.example.advance_video_stream.libre_tube.responsedata.PreviewFrames
-import com.example.advance_video_stream.libre_tube.responsedata.StreamItem
+import com.example.advance_video_stream.libre_tube.response.PreviewFrames
+import com.example.advance_video_stream.libre_tube.response.StreamItem
 import java.time.Instant
+import androidx.annotation.Keep
 
+@Keep
 data class Streams(
     val title: String,
     val description: String,

@@ -1,6 +1,7 @@
 package com.example.advance_video_stream.libre_tube.hls
 
 import android.net.Uri
+import androidx.annotation.Keep
 import androidx.annotation.OptIn
 import androidx.media3.common.C
 import androidx.media3.common.Format
@@ -29,6 +30,7 @@ import java.io.InputStream
  * It relies internally on a default [HlsPlaylistParser] and processes audio tracks when the
  * [HlsPlaylistParser] instance used parsed the manifest.
  */
+@Keep
 @OptIn(UnstableApi::class)
 class YoutubeHlsPlaylistParser : ParsingLoadable.Parser<HlsPlaylist> {
 

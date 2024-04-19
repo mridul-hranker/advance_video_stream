@@ -13,8 +13,38 @@ class MethodChannelAdvanceVideoStream extends AdvanceVideoStreamPlatform {
   final methodChannel = const MethodChannel('advance_video_stream');
 
   @override
+  Future<void> play() async {
+    await methodChannel.invokeMethod<void>('play');
+  }
+
+  @override
+  Future<void> pause() async {
+    await methodChannel.invokeMethod<void>('pause');
+  }
+
+  @override
+  Future<int?> getPlayer() async {
+    return await methodChannel.invokeMethod<int?>('getPlayer');
+  }
+
+  @override
   Future<void> setVideoData(String videoId, bool useHLS) async {
-    await methodChannel.invokeMethod<String>('setVideoData', {"videoId": videoId, "useHLS": useHLS});
+    await methodChannel.invokeMethod<void>('setVideoData', {"videoId": videoId, "useHLS": useHLS});
+  }
+
+  @override
+  Future<int?> getCurrentPosition() async {
+    return await methodChannel.invokeMethod<int>('getCurrentPosition');
+  }
+
+  @override
+  Future<int?> setCurrentPosition(int position) async {
+    return await methodChannel.invokeMethod<int>('setCurrentPosition', {"position": position});
+  }
+
+  @override
+  Future<void> changeOrientation(bool isLandscape) async {
+    await methodChannel.invokeMethod<void>('changeOrientation', {"isLandscape": isLandscape});
   }
 
   @override

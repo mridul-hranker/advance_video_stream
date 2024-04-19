@@ -26,8 +26,32 @@ abstract class AdvanceVideoStreamPlatform extends PlatformInterface {
     _instance = instance;
   }
 
+  Future<void> play() {
+    throw UnimplementedError('play has not been implemented.');
+  }
+
+  Future<void> pause() {
+    throw UnimplementedError('pause has not been implemented.');
+  }
+
+  Future<int?> getPlayer() {
+    throw UnimplementedError('getPlayer has not been implemented.');
+  }
+
+  Future<int?> getCurrentPosition() {
+    throw UnimplementedError('getCurrentPosition has not been implemented.');
+  }
+
   Future<void> setVideoData(String videoId, bool useHLS) {
     throw UnimplementedError('setVideoData(String videoId, bool useHLS) has not been implemented.');
+  }
+
+  Future<void> setCurrentPosition(int position) {
+    throw UnimplementedError('setCurrentPosition has not been implemented.');
+  }
+
+  Future<void> changeOrientation(bool isLandscape) {
+    throw UnimplementedError('changeOrientation has not been implemented.');
   }
 
   AdvancePlayer player(double aspectRatio, double? height) {

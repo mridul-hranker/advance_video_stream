@@ -1,5 +1,6 @@
 package com.example.advance_video_stream.network
 
+import androidx.annotation.Keep
 import com.google.net.cronet.okhttptransport.CronetCallFactory
 import com.example.advance_video_stream.AdvanceVideoStreamPlugin
 import okhttp3.OkHttpClient
@@ -9,8 +10,8 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 
+@Keep
 object RetrofitManager {
-
 
     val getClient: APIClient by lazy {
         Retrofit.Builder().baseUrl("https://pipedapi.kavin.rocks")

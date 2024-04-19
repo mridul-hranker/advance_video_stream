@@ -1,7 +1,9 @@
 package com.example.advance_video_stream.libre_tube.response
 
 import android.graphics.drawable.Drawable
+import androidx.annotation.Keep
 
+@Keep
 data class ChapterSegment(
     val title: String,
     val image: String = "",

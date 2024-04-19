@@ -1,4 +1,9 @@
-package com.example.advance_video_stream.libre_tube.responsedata class PipedStream(
+package com.example.advance_video_stream.libre_tube.response
+
+import androidx.annotation.Keep
+
+@Keep
+data class PipedStream(
     val url: String? = null,
     val format: String? = null,
     val quality: String? = null,
