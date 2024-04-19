@@ -27,7 +27,6 @@ import com.example.advance_video_stream.libre_tube.ProxyHelper
 import com.example.advance_video_stream.libre_tube.dash.DashHelper
 import com.example.advance_video_stream.libre_tube.hls.YoutubeHlsPlaylistParser
 import com.example.advance_video_stream.libre_tube.response.Streams
-import com.example.advance_video_stream.libre_tube.setMetadata
 import com.example.advance_video_stream.network.CronetHelper
 import com.example.advance_video_stream.view_model.VideoDataVM
 import io.flutter.view.TextureRegistry
@@ -87,7 +86,6 @@ class ExoPlayerView(private val context: Context) {
                     val mediaItem = MediaItem.Builder()
                         .setUri(uri)
                         .setMimeType("application/dash+xml")
-                        .setMetadata(streams)
                         .build()
 
                     MainScope().launch {
@@ -106,7 +104,6 @@ class ExoPlayerView(private val context: Context) {
                     val mediaSourceCreator = MediaItem.Builder()
                         .setUri(Uri.parse(ProxyHelper.unwrapStreamUrl(streams.hls!!)))
                         .setMimeType("application/x-mpegURL")
-                        .setMetadata(streams)
                         .build()
 
                     val mediaSource = hlsMediaSourceFactory.createMediaSource(mediaSourceCreator)
