@@ -48,7 +48,7 @@ class CustomPlayerView(context: Context, attrs: AttributeSet?) : PlayerView(cont
     private var isLive: Boolean = false
 
     private val qualityList = mutableListOf<VideoResolution>()
-    private val speedList = listOf(0.5f, 1f, 1.25f, 1.5f, 1.75f, 2f)
+    private val speedList = listOf(0.5f, 0.75f, 1f, 1.25f, 1.5f, 1.75f, 2f)
 
     private lateinit var defaultTrackSelector: DefaultTrackSelector
 
@@ -120,7 +120,7 @@ class CustomPlayerView(context: Context, attrs: AttributeSet?) : PlayerView(cont
 
         spinnerSpeed.onItemSelectedListener = this
 
-        spinnerSpeed.setSelection(1, true)
+        spinnerSpeed.setSelection(2, true)
     }
 
     init {

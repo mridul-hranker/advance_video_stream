@@ -13,6 +13,26 @@ class MethodChannelAdvanceVideoStream extends AdvanceVideoStreamPlatform {
   final methodChannel = const MethodChannel('advance_video_stream');
 
   @override
+  SurfacePlayer getSurfacePlayer() {
+    return SurfacePlayer(methodChannel: methodChannel, aspectRatio: 16 / 9);
+  }
+
+  @override
+  Future<void> playSurfacePlayer() async {
+    await methodChannel.invokeMethod<void>('playSurfacePlayer');
+  }
+
+  @override
+  Future<void> pauseSurfacePlayer() async {
+    await methodChannel.invokeMethod<void>('pauseSurfacePlayer');
+  }
+
+  @override
+  Future<void> setSurfacePlayerVideoData(String videoId, bool useHLS) async {
+    await methodChannel.invokeMethod<void>('setSurfacePlayerVideoData', {"videoId": videoId, "useHLS": useHLS});
+  }
+
+  @override
   Future<void> play() async {
     await methodChannel.invokeMethod<void>('play');
   }
@@ -20,11 +40,6 @@ class MethodChannelAdvanceVideoStream extends AdvanceVideoStreamPlatform {
   @override
   Future<void> pause() async {
     await methodChannel.invokeMethod<void>('pause');
-  }
-
-  @override
-  Future<int?> getPlayer() async {
-    return await methodChannel.invokeMethod<int?>('getPlayer');
   }
 
   @override
@@ -85,6 +100,45 @@ class AdvancePlayer extends StatelessWidget {
                 ..create();
             },
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class SurfacePlayer extends StatefulWidget {
+  final MethodChannel methodChannel;
+  final double aspectRatio;
+  final double? height;
+
+  const SurfacePlayer({super.key, required this.methodChannel, required this.aspectRatio, this.height});
+
+  @override
+  State<SurfacePlayer> createState() => _SurfacePlayerState();
+}
+
+class _SurfacePlayerState extends State<SurfacePlayer> {
+  int? textureId;
+
+  @override
+  void initState() {
+    super.initState();
+
+    widget.methodChannel.invokeMethod<int?>('getSurfacePlayer').then((value) => setState(() => textureId = value ?? -86));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      child: SizedBox(
+        height: widget.height,
+        child: AspectRatio(
+          aspectRatio: widget.aspectRatio,
+          child: (textureId != null)
+              ? (textureId != -86)
+                  ? Texture(textureId: textureId!)
+                  : Container(color: Colors.red)
+              : const Center(child: CircularProgressIndicator()),
         ),
       ),
     );

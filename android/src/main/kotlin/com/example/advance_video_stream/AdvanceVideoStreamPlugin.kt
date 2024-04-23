@@ -44,7 +44,9 @@ class AdvanceVideoStreamPlugin : FlutterPlugin, MethodCallHandler {
 
     private lateinit var textureRegistry: TextureRegistry
 
-    val nativeViewFactory = NativeViewFactory()
+    private val nativeViewFactory = NativeViewFactory()
+
+    private lateinit var surfacePlayer: ExoPlayerView
 
     override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         channel = MethodChannel(flutterPluginBinding.binaryMessenger, "advance_video_stream")
@@ -57,18 +59,32 @@ class AdvanceVideoStreamPlugin : FlutterPlugin, MethodCallHandler {
     }
 
     override fun onMethodCall(call: MethodCall, result: Result) {
-        if (call.method == "getPlatformVersion") {
-            result.success("Android ${android.os.Build.VERSION.RELEASE}")
-        } else if (call.method == "getPlayer") {
+        if (call.method == "getSurfacePlayer") {
             Log.d(TAG, "onMethodCall: getPlayer")
 
-            val handle: TextureRegistry.SurfaceTextureEntry? = textureRegistry.createSurfaceTexture()
+            val handle: TextureRegistry.SurfaceTextureEntry = textureRegistry.createSurfaceTexture()
 
             Log.d(TAG, "onMethodCall: getPlayer handle.id ${handle?.id()}")
 
-            ExoPlayerView(context!!).getSurface(handle)
+            surfacePlayer = ExoPlayerView(context!!, handle)
 
             result.success(handle!!.id())
+        } else if (call.method == "playSurfacePlayer") {
+            surfacePlayer.playPlayer()
+        } else if (call.method == "pauseSurfacePlayer") {
+            surfacePlayer.pausePlayer()
+        } else if (call.method == "setSurfacePlayerVideoData") {
+            Log.d(TAG, "onMethodCall: setSurfacePlayerVideoData")
+
+            val videoData = call.arguments as Map<*, *>
+
+            val videoId: String = videoData["videoId"] as String
+            val useHLS: Boolean = videoData["useHLS"] as Boolean
+
+            Log.d(TAG, "onMethodCall: setVideoData videoId ${videoData["videoId"]}")
+            Log.d(TAG, "onMethodCall: setVideoData useHLS ${videoData["useHLS"]}")
+
+            surfacePlayer.updatePlayerItem(videoId, useHLS)
         } else if (call.method == "setVideoData") {
             Log.d(TAG, "onMethodCall: setVideoData")
 
@@ -126,6 +142,9 @@ class AdvanceVideoStreamPlugin : FlutterPlugin, MethodCallHandler {
 //        context = null
 
 //        nativeViewFactory
+
+        Log.d(TAG, "onDetachedFromEngine: called")
+        surfacePlayer.dispose()
 
         channel.setMethodCallHandler(null)
     }

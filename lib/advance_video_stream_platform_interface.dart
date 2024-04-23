@@ -1,6 +1,3 @@
-import 'dart:ffi';
-
-import 'package:flutter/widgets.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 import 'advance_video_stream_method_channel.dart';
@@ -26,16 +23,30 @@ abstract class AdvanceVideoStreamPlatform extends PlatformInterface {
     _instance = instance;
   }
 
+  //Surface Player
+  SurfacePlayer getSurfacePlayer() {
+    throw UnimplementedError('getSurfacePlayer has not been implemented.');
+  }
+
+  Future<void> playSurfacePlayer() {
+    throw UnimplementedError('playSurfacePlayer has not been implemented.');
+  }
+
+  Future<void> pauseSurfacePlayer() {
+    throw UnimplementedError('pauseSurfacePlayer has not been implemented.');
+  }
+
+  Future<void> setSurfacePlayerVideoData(String videoId, bool useHLS) {
+    throw UnimplementedError('setSurfacePlayerVideoData(String videoId, bool useHLS) has not been implemented.');
+  }
+
+  //Standard Player
   Future<void> play() {
     throw UnimplementedError('play has not been implemented.');
   }
 
   Future<void> pause() {
     throw UnimplementedError('pause has not been implemented.');
-  }
-
-  Future<int?> getPlayer() {
-    throw UnimplementedError('getPlayer has not been implemented.');
   }
 
   Future<int?> getCurrentPosition() {

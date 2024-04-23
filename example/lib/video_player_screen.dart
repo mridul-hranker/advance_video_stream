@@ -19,6 +19,8 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
 
   @override
   void didChangeDependencies() {
+    Future.delayed(Duration.zero, () => _advanceVideoStreamPlugin.setSurfacePlayerVideoData(videoId: widget.videoId, useHLS: true));
+
     /*Timer(const Duration(seconds: 5), () {
       _advanceVideoStreamPlugin.getPlayer().then((value) {
         debugPrint("VideoPlayerScreen didChangeDependencies getPlayer value $value");
@@ -29,7 +31,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
       });
     });*/
 
-    Timer(const Duration(seconds: 10), () {
+    /*Timer(const Duration(seconds: 10), () {
       _advanceVideoStreamPlugin.setVideoData(videoId: widget.videoId, useHLS: true);
     });
 
@@ -43,7 +45,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
     Timer(const Duration(seconds: 25), () {
       _advanceVideoStreamPlugin.setCurrentPosition(position!);
       debugPrint("VideoPlayerScreen didChangeDependencies setCurrentPosition $position");
-    });
+    });*/
 
     super.didChangeDependencies();
   }
@@ -53,7 +55,11 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
     return Scaffold(
       body: AspectRatio(
         aspectRatio: MediaQuery.of(context).size.aspectRatio,
-        child: _advanceVideoStreamPlugin.player(aspectRatio: MediaQuery.of(context).size.aspectRatio, height: 100),
+        child: InkWell(
+            onTap: () {
+              _advanceVideoStreamPlugin.playSurfacePlayer();
+            },
+            child: _advanceVideoStreamPlugin.getSurfacePlayer()),
       ),
     );
   }

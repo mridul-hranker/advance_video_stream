@@ -173,11 +173,4 @@ class NativeView(context: Context, id: Int, creationParams: Map<String?, Any?>?)
             AspectRatioFrameLayout.RESIZE_MODE_FILL
         }
     }
-
-    fun getSurface(textureEntry: TextureRegistry.SurfaceTextureEntry?) {
-        if (textureEntry != null) {
-            val surface = Surface(textureEntry.surfaceTexture())
-            exoPlayer.setVideoSurface(surface)
-        }
-    }
 }

@@ -18,6 +18,8 @@ import androidx.media3.exoplayer.LoadControl
 import androidx.media3.exoplayer.hls.HlsMediaSource
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
+import androidx.media3.common.Player
+import androidx.media3.common.Player.Listener
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
@@ -34,7 +36,7 @@ import com.example.advance_video_stream.AdvanceVideoStreamPlugin
 import android.view.Surface
 
 @OptIn(UnstableApi::class)
-class ExoPlayerView(private val context: Context) {
+class ExoPlayerView(private val context: Context, private val textureEntry: TextureRegistry.SurfaceTextureEntry) {
     private val TAG = "ExoPlayerView"
     private val exoPlayer: ExoPlayer
 
@@ -54,19 +56,49 @@ class ExoPlayerView(private val context: Context) {
             .setTrackSelector(DefaultTrackSelector(context))
             .setAudioAttributes(audioAttributes, false)
             .setLoadControl(getLoadControl()).build()
-    }
 
-    fun getSurface(textureEntry: TextureRegistry.SurfaceTextureEntry?) {
-        if (textureEntry != null) {
-            val surface = Surface(textureEntry.surfaceTexture())
-            exoPlayer.setVideoSurface(surface)
-//            updatePlayerItem("21bCrsGt050", true)
-        }
+        val surface = Surface(textureEntry.surfaceTexture())
+        exoPlayer.setVideoSurface(surface)
+
+//        updatePlayerItem("21bCrsGt050", true)
+
+        exoPlayer.addListener(object : Listener {
+            override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
+                if (playbackState == Player.STATE_BUFFERING) {
+//                setBuffering(true)
+//                sendBufferingUpdate()
+                    Log.d(TAG, "onPlayerStateChanged: playbackState == Player.STATE_BUFFERING called")
+
+                    val range: List<Long> = listOf(0, exoPlayer.bufferedPosition)
+
+                    range.forEach {
+                        Log.d(TAG, "onPlayerStateChanged: playbackState == Player.STATE_BUFFERING range $it")
+                    }
+
+                } else if (playbackState == Player.STATE_READY) {
+//                if (!isInitialized) {
+//                    isInitialized = true
+//                    sendInitialized()
+//                }
+                    Log.d(TAG, "onPlayerStateChanged: playbackState == Player.STATE_READY called")
+                } else if (playbackState == Player.STATE_ENDED) {
+                    val event: MutableMap<String, Any> = HashMap()
+                    event["event"] = "completed"
+//                eventSink.success(event)
+                    Log.d(TAG, "onPlayerStateChanged: playbackState == Player.STATE_ENDED called")
+                }
+
+                if (playbackState != Player.STATE_BUFFERING) {
+//                setBuffering(false)
+                    Log.d(TAG, "onPlayerStateChanged: playbackState != Player.STATE_BUFFERING called")
+                }
+            }
+        })
     }
 
     fun updatePlayerItem(videoId: String, useHLS: Boolean = false) {
         CoroutineScope(Dispatchers.IO).launch {
-            val getData =  VideoDataVM().getData(videoId)
+            val getData = VideoDataVM().getData(videoId)
             getData.start()
             val streams: Streams? = getData.await()
             if (streams != null) {
@@ -91,8 +123,6 @@ class ExoPlayerView(private val context: Context) {
                     MainScope().launch {
                         exoPlayer.setMediaItem(mediaItem)
                         exoPlayer.prepare()
-//                        playerView.initialize(streams.livestream, exoPlayer)
-//                        playerView.topBarTextVideoTitle.text = streams.title
                         exoPlayer.playWhenReady = true
                     }
                 } else {
@@ -137,5 +167,19 @@ class ExoPlayerView(private val context: Context) {
                 DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS
             )
             .build()
+    }
+
+    fun playPlayer() {
+        exoPlayer.playWhenReady = true;
+    }
+
+    fun pausePlayer() {
+        exoPlayer.playWhenReady = false;
+    }
+
+    fun dispose() {
+        exoPlayer.stop()
+        exoPlayer.release()
+        Log.d(TAG, "dispose: called")
     }
 }

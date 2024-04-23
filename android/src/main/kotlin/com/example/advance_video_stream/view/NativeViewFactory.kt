@@ -29,6 +29,4 @@ class NativeViewFactory : PlatformViewFactory(StandardMessageCodec.INSTANCE) {
     fun setPosition(position: Long) = nativeView.setPosition(position)
 
     fun setOrientationAspectRatio(isLandscape: Boolean) = nativeView.setOrientationAspectRatio(isLandscape)
-
-    fun getSurface(textureEntry: TextureRegistry.SurfaceTextureEntry?) = nativeView.getSurface(textureEntry);
 }
