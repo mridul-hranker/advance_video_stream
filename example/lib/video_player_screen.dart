@@ -1,7 +1,9 @@
 import 'dart:async';
 
 import 'package:advance_video_stream/advance_video_stream.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 class VideoPlayerScreen extends StatefulWidget {
   final String videoId;
@@ -51,15 +53,30 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   }
 
   @override
+  void dispose() {
+    super.dispose();
+    _advanceVideoStreamPlugin.disposeSurfacePlayer();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: AspectRatio(
         aspectRatio: MediaQuery.of(context).size.aspectRatio,
-        child: InkWell(
-            onTap: () {
-              _advanceVideoStreamPlugin.playSurfacePlayer();
-            },
-            child: _advanceVideoStreamPlugin.getSurfacePlayer()),
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            _advanceVideoStreamPlugin.getSurfacePlayer(),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                IconButton(onPressed: () => _advanceVideoStreamPlugin.pauseSurfacePlayer(), icon: const Icon(Icons.pause)),
+                IconButton(onPressed: () => _advanceVideoStreamPlugin.playSurfacePlayer(), icon: const Icon(Icons.play_arrow)),
+              ],
+            )
+          ],
+        ),
       ),
     );
   }

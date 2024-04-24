@@ -10,6 +10,10 @@ class AdvanceVideoStream {
     return AdvanceVideoStreamPlatform.instance.getSurfacePlayer();
   }
 
+  Future<void> disposeSurfacePlayer() {
+    return AdvanceVideoStreamPlatform.instance.disposeSurfacePlayer();
+  }
+
   Future<void> playSurfacePlayer() {
     return AdvanceVideoStreamPlatform.instance.playSurfacePlayer();
   }

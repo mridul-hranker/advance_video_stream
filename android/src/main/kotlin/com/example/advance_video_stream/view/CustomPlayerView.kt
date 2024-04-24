@@ -1,6 +1,7 @@
 package com.example.advance_video_stream.view
 
 import android.content.Context
+import android.graphics.Color
 import android.os.Handler
 import android.os.Looper
 import android.text.format.DateUtils
@@ -13,6 +14,7 @@ import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.Spinner
 import android.widget.TextView
+import androidx.annotation.ColorInt
 import androidx.annotation.OptIn
 import androidx.media3.common.C
 import androidx.media3.common.PlaybackParameters
@@ -150,6 +152,9 @@ class CustomPlayerView(context: Context, attrs: AttributeSet?) : PlayerView(cont
             Log.d(TAG, "setOnClickListener forwardBTN: seekDiff $seekDiff")
             player?.seekTo(seekDiff)
         }
+
+//        this.setBackgroundColor(Color.valueOf(0.0F, 0.0F,0.0F).toArgb())
+        this.setBackgroundColor(android.R.color.black)
 
         updateCurrentPosition()
     }

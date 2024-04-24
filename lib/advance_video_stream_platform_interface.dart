@@ -28,6 +28,10 @@ abstract class AdvanceVideoStreamPlatform extends PlatformInterface {
     throw UnimplementedError('getSurfacePlayer has not been implemented.');
   }
 
+  Future<void> disposeSurfacePlayer() async {
+    throw UnimplementedError('disposeSurfacePlayer has not been implemented.');
+  }
+
   Future<void> playSurfacePlayer() {
     throw UnimplementedError('playSurfacePlayer has not been implemented.');
   }

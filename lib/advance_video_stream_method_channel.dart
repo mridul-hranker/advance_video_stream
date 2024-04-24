@@ -18,6 +18,11 @@ class MethodChannelAdvanceVideoStream extends AdvanceVideoStreamPlatform {
   }
 
   @override
+  Future<void> disposeSurfacePlayer() async {
+    await methodChannel.invokeMethod<void>('disposeSurfacePlayer');
+  }
+
+  @override
   Future<void> playSurfacePlayer() async {
     await methodChannel.invokeMethod<void>('playSurfacePlayer');
   }

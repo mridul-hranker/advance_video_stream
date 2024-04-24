@@ -46,7 +46,7 @@ class AdvanceVideoStreamPlugin : FlutterPlugin, MethodCallHandler {
 
     private val nativeViewFactory = NativeViewFactory()
 
-    private lateinit var surfacePlayer: ExoPlayerView
+    private var surfacePlayer: ExoPlayerView? = null
 
     override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         channel = MethodChannel(flutterPluginBinding.binaryMessenger, "advance_video_stream")
@@ -69,10 +69,16 @@ class AdvanceVideoStreamPlugin : FlutterPlugin, MethodCallHandler {
             surfacePlayer = ExoPlayerView(context!!, handle)
 
             result.success(handle!!.id())
+        } else if (call.method == "disposeSurfacePlayer") {
+            Log.d(TAG, "onMethodCall: disposeSurfacePlayer")
+
+            surfacePlayer?.dispose()
+            surfacePlayer = null
+
         } else if (call.method == "playSurfacePlayer") {
-            surfacePlayer.playPlayer()
+            surfacePlayer?.playPlayer()
         } else if (call.method == "pauseSurfacePlayer") {
-            surfacePlayer.pausePlayer()
+            surfacePlayer?.pausePlayer()
         } else if (call.method == "setSurfacePlayerVideoData") {
             Log.d(TAG, "onMethodCall: setSurfacePlayerVideoData")
 
@@ -84,7 +90,7 @@ class AdvanceVideoStreamPlugin : FlutterPlugin, MethodCallHandler {
             Log.d(TAG, "onMethodCall: setVideoData videoId ${videoData["videoId"]}")
             Log.d(TAG, "onMethodCall: setVideoData useHLS ${videoData["useHLS"]}")
 
-            surfacePlayer.updatePlayerItem(videoId, useHLS)
+            surfacePlayer?.updatePlayerItem(videoId, useHLS)
         } else if (call.method == "setVideoData") {
             Log.d(TAG, "onMethodCall: setVideoData")
 
@@ -144,7 +150,7 @@ class AdvanceVideoStreamPlugin : FlutterPlugin, MethodCallHandler {
 //        nativeViewFactory
 
         Log.d(TAG, "onDetachedFromEngine: called")
-        surfacePlayer.dispose()
+        surfacePlayer?.dispose()
 
         channel.setMethodCallHandler(null)
     }
