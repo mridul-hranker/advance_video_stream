@@ -9,7 +9,7 @@ import 'advance_video_stream_platform_interface.dart';
 /// An implementation of [AdvanceVideoStreamPlatform] that uses method channels.
 class MethodChannelAdvanceVideoStream extends AdvanceVideoStreamPlatform {
   /// The method channel used to interact with the native platform.
-  @visibleForTesting
+
   final methodChannel = const MethodChannel('advance_video_stream');
 
   @override

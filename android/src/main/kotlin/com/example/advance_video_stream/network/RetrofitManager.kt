@@ -45,5 +45,10 @@ object CronetHelper {
         .enableHttpCache(CronetEngine.Builder.HTTP_CACHE_IN_MEMORY, 1024L * 1024L) // 1MiB
         .build()
 
+    /*fun getCallFactory(): CronetCallFactory {
+        return C
+    }*/
+
+
     val callFactory: CronetCallFactory = CronetCallFactory.newBuilder(cronetEngine).build()
 }

@@ -2,6 +2,7 @@ package com.example.advance_video_stream
 
 import android.content.Context
 import android.net.Uri
+import android.os.Build
 import android.util.Base64
 import android.util.Log
 import androidx.annotation.NonNull
@@ -59,12 +60,14 @@ class AdvanceVideoStreamPlugin : FlutterPlugin, MethodCallHandler {
     }
 
     override fun onMethodCall(call: MethodCall, result: Result) {
-        if (call.method == "getSurfacePlayer") {
+        if (isEmulator) {
+            Log.d(TAG, "onMethodCall: you are on Emulator")
+        } else if (call.method == "getSurfacePlayer") {
             Log.d(TAG, "onMethodCall: getPlayer")
 
             val handle: TextureRegistry.SurfaceTextureEntry = textureRegistry.createSurfaceTexture()
 
-            Log.d(TAG, "onMethodCall: getPlayer handle.id ${handle?.id()}")
+//            Log.d(TAG, "onMethodCall: getPlayer handle.id ${handle?.id()}")
 
             surfacePlayer = ExoPlayerView(context!!, handle)
 
@@ -87,8 +90,8 @@ class AdvanceVideoStreamPlugin : FlutterPlugin, MethodCallHandler {
             val videoId: String = videoData["videoId"] as String
             val useHLS: Boolean = videoData["useHLS"] as Boolean
 
-            Log.d(TAG, "onMethodCall: setVideoData videoId ${videoData["videoId"]}")
-            Log.d(TAG, "onMethodCall: setVideoData useHLS ${videoData["useHLS"]}")
+//            Log.d(TAG, "onMethodCall: setVideoData videoId ${videoData["videoId"]}")
+//            Log.d(TAG, "onMethodCall: setVideoData useHLS ${videoData["useHLS"]}")
 
             surfacePlayer?.updatePlayerItem(videoId, useHLS)
         } else if (call.method == "setVideoData") {
@@ -99,8 +102,8 @@ class AdvanceVideoStreamPlugin : FlutterPlugin, MethodCallHandler {
             val videoId: String = videoData["videoId"] as String
             val useHLS: Boolean = videoData["useHLS"] as Boolean
 
-            Log.d(TAG, "onMethodCall: setVideoData videoId ${videoData["videoId"]}")
-            Log.d(TAG, "onMethodCall: setVideoData useHLS ${videoData["useHLS"]}")
+//            Log.d(TAG, "onMethodCall: setVideoData videoId ${videoData["videoId"]}")
+//            Log.d(TAG, "onMethodCall: setVideoData useHLS ${videoData["useHLS"]}")
 
             updatePlayerItem(videoId, useHLS)
         } else if (call.method == "getCurrentPosition") {
@@ -108,7 +111,7 @@ class AdvanceVideoStreamPlugin : FlutterPlugin, MethodCallHandler {
 
             val position = nativeViewFactory.getPosition()
 
-            Log.d(TAG, "onMethodCall: getCurrentPosition position $position")
+//            Log.d(TAG, "onMethodCall: getCurrentPosition position $position")
 
             result.success(position)
         } else if (call.method == "setCurrentPosition") {
@@ -118,7 +121,7 @@ class AdvanceVideoStreamPlugin : FlutterPlugin, MethodCallHandler {
 
             val position: Long = positionData["position"].toString().toLong()
 
-            Log.d(TAG, "onMethodCall: getCurrentPosition position $position")
+//            Log.d(TAG, "onMethodCall: getCurrentPosition position $position")
 
             nativeViewFactory.setPosition(position)
         } else if (call.method == "changeOrientation") {
@@ -128,7 +131,7 @@ class AdvanceVideoStreamPlugin : FlutterPlugin, MethodCallHandler {
 
             val isLandscape: Boolean = orientationData["isLandscape"] as Boolean
 
-            Log.d(TAG, "onMethodCall: changeOrientation orientation $isLandscape")
+//            Log.d(TAG, "onMethodCall: changeOrientation orientation $isLandscape")
 
             nativeViewFactory.setOrientationAspectRatio(isLandscape)
         } else if (call.method == "play") {
@@ -158,4 +161,28 @@ class AdvanceVideoStreamPlugin : FlutterPlugin, MethodCallHandler {
     private fun updatePlayerItem(videoId: String, useHLS: Boolean = false) {
         nativeViewFactory.updatePlayerItem(videoId, useHLS)
     }
+
+
+    //Reference from the device-info plugin by flutter community
+    /**
+     * A simple emulator-detection based on the flutter tools detection logic and a couple of legacy
+     * detection systems
+     */
+    private val isEmulator: Boolean
+        get() = (Build.BRAND.startsWith("generic") && Build.DEVICE.startsWith("generic")
+                || Build.FINGERPRINT.startsWith("generic")
+                || Build.FINGERPRINT.startsWith("unknown")
+                || Build.HARDWARE.contains("goldfish")
+                || Build.HARDWARE.contains("ranchu")
+                || Build.MODEL.contains("google_sdk")
+                || Build.MODEL.contains("Emulator")
+                || Build.MODEL.contains("Android SDK built for x86")
+                || Build.MANUFACTURER.contains("Genymotion")
+                || Build.PRODUCT.contains("sdk_google")
+                || Build.PRODUCT.contains("google_sdk")
+                || Build.PRODUCT.contains("sdk")
+                || Build.PRODUCT.contains("sdk_x86")
+                || Build.PRODUCT.contains("vbox86p")
+                || Build.PRODUCT.contains("emulator")
+                || Build.PRODUCT.contains("simulator"))
 }

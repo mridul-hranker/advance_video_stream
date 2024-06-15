@@ -1,6 +1,7 @@
 package com.example.advance_video_stream.libre_tube.dash
 
 import androidx.annotation.Keep
+import com.example.advance_video_stream.libre_tube.ProxyHelper
 import com.example.advance_video_stream.libre_tube.response.Streams
 import com.example.advance_video_stream.libre_tube.response.PipedStream
 import java.io.StringWriter
@@ -161,7 +162,7 @@ object DashHelper {
         audioChannelConfiguration.setAttribute("value", "2")
 
         val baseUrl = doc.createElement("BaseURL")
-        baseUrl.appendChild(doc.createTextNode(stream.url!!))
+        baseUrl.appendChild(doc.createTextNode(ProxyHelper.unwrapUrl(stream.url!!, true)))
 
         representation.appendChild(audioChannelConfiguration)
         representation.appendChild(baseUrl)
@@ -203,7 +204,7 @@ object DashHelper {
         representation.setAttribute("frameRate", stream.fps.toString())
 
         val baseUrl = doc.createElement("BaseURL")
-        baseUrl.appendChild(doc.createTextNode(stream.url!!))
+        baseUrl.appendChild(doc.createTextNode(ProxyHelper.unwrapUrl(stream.url!!, true)))
 
         val segmentBase = doc.createElement("SegmentBase")
         segmentBase.setAttribute("indexRange", "${stream.indexStart}-${stream.indexEnd}")

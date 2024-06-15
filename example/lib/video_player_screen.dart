@@ -21,7 +21,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
 
   @override
   void didChangeDependencies() {
-    Future.delayed(Duration.zero, () => _advanceVideoStreamPlugin.setSurfacePlayerVideoData(videoId: widget.videoId, useHLS: true));
+    Future.delayed(Duration.zero, () => _advanceVideoStreamPlugin.setSurfacePlayerVideoData(videoId: widget.videoId, useHLS: false));
 
     /*Timer(const Duration(seconds: 5), () {
       _advanceVideoStreamPlugin.getPlayer().then((value) {

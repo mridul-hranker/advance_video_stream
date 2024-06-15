@@ -1,5 +1,6 @@
 package com.example.advance_video_stream.libre_tube
 
+import android.util.Log
 import androidx.annotation.Keep
 import com.example.advance_video_stream.network.CronetHelper
 import java.net.HttpURLConnection
@@ -14,12 +15,17 @@ import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 object ProxyHelper {
 
     private const val disablePipedProxy: Boolean = true
-    
+
     /**
      * Detect whether the proxy should be used or not for a given stream URL based on user preferences
      */
     fun unwrapStreamUrl(url: String): String {
         return if (disablePipedProxy) {
+
+            Log.d("unwrapStreamUrl url:", url)
+            Log.d("unwrapStreamUrl url:","")
+            Log.d("unwrapStreamUrl unwrapUrl(url):", unwrapUrl(url))
+
             unwrapUrl(url)
         } else {
             url

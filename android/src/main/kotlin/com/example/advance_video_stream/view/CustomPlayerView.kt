@@ -30,6 +30,7 @@ import com.example.advance_video_stream.libre_tube.VideoResolution
 import com.example.advance_video_stream.libre_tube.round
 import com.example.advance_video_stream.libre_tube.updateParameters
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import java.util.Locale
 
 @UnstableApi
 class CustomPlayerView(context: Context, attrs: AttributeSet?) : PlayerView(context, attrs), AdapterView.OnItemSelectedListener {
@@ -114,7 +115,7 @@ class CustomPlayerView(context: Context, attrs: AttributeSet?) : PlayerView(cont
     }
 
     fun setPlaybackSpeed() {
-        val speedUi = speedList.map { "${String.format(" % .2f", it)}x" }
+        val speedUi = speedList.map { "${String.format(Locale.ROOT," % .2f", it)}x" }
 
         val arrayAdapter = ArrayAdapter(context, R.layout.dropdown_item, speedUi)
         arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -129,6 +130,9 @@ class CustomPlayerView(context: Context, attrs: AttributeSet?) : PlayerView(cont
         Log.d(TAG, "init: called")
 
         playPauseBTN.setOnClickListener {
+
+            Log.d(TAG,"init playPauseBTN setOnClickListener clicked")
+
             if (player?.isPlaying == true || player?.playbackState == Player.STATE_ENDED) {
                 player?.pause()
             } else {
@@ -165,7 +169,9 @@ class CustomPlayerView(context: Context, attrs: AttributeSet?) : PlayerView(cont
         val timeLeft = duration - position
 
         this.position.text = if (isLive) "Live" else DateUtils.formatElapsedTime(position)
-        this.duration.text = "-${DateUtils.formatElapsedTime(timeLeft)}"
+        this.duration.text = String.format("-%s",DateUtils.formatElapsedTime(timeLeft))
+        //this.duration.text = "-${DateUtils.formatElapsedTime(timeLeft)}"
+
 
         runnableHandler.postDelayed(this::updateCurrentPosition, 100)
     }
@@ -211,7 +217,7 @@ class CustomPlayerView(context: Context, attrs: AttributeSet?) : PlayerView(cont
             }
         } else if (parent?.id == spinnerSpeed.id) {/*Log.d(TAG, "onItemSelected: view == spinnerSpeed")
             Log.d(TAG, "onItemSelected: view == spinnerSpeed speedList[position].round(2) ${speedList[position].round(2)}")*/
-            player?.playbackParameters = PlaybackParameters(speedList[position].round(2), 1f)
+            player?.setPlaybackSpeed(speedList[position].round(2))
         }
     }
 
