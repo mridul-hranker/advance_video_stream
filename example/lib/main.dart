@@ -35,32 +35,35 @@ class MyColumn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        // Text('Running on: $_platformVersion\n'),
-        ElevatedButton(
-            onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => VideoPlayerScreen(videoId: "21bCrsGt050")));
-            },
-            child: const Text('Ent.')),
-        ElevatedButton(
-            onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => VideoPlayerScreen(videoId: "ZRtdQ81jPUQ")));
-            },
-            child: const Text('Ido.')),
-        ElevatedButton(
-            onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => VideoPlayerScreen(videoId: "OIBODIPC_8Y")));
-            },
-            child: const Text('Yus.')),
-        ElevatedButton(
-            onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => VideoPlayerScreen(videoId: "jfKfPfyJRdk")));
-            },
-            child: const Text('Liv.')),
-      ],
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          // Text('Running on: $_platformVersion\n'),
+          ElevatedButton(
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => VideoPlayerScreen(videoId: "21bCrsGt050")));
+              },
+              child: const Text('Entertainment')),
+          /*ElevatedButton(
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => VideoPlayerScreen(videoId: "ZRtdQ81jPUQ")));
+              },
+              child: const Text('Ido.')),*/
+          ElevatedButton(
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => VideoPlayerScreen(videoId: "OIBODIPC_8Y")));
+              },
+              child: const Text('Yuusha')),
+          ElevatedButton(
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => VideoPlayerScreen(videoId: "jfKfPfyJRdk")));
+              },
+              child: const Text('Live video')),
+        ],
+      ),
     );
   }
 }

@@ -6,28 +6,14 @@ import android.os.Build
 import android.util.Base64
 import android.util.Log
 import androidx.annotation.NonNull
-import androidx.media3.common.MediaItem
-import androidx.media3.exoplayer.ExoPlayer
-import com.example.advance_video_stream.libre_tube.dash.DashHelper
-
-import com.example.advance_video_stream.libre_tube.response.Streams
-import com.example.advance_video_stream.view.Controller
 import com.example.advance_video_stream.view.NativeViewFactory
 import com.example.advance_video_stream.view.ExoPlayerView
-import com.example.advance_video_stream.view_model.VideoDataVM
-
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
 import io.flutter.view.TextureRegistry
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
 
 /** AdvanceVideoStreamPlugin */
 class AdvanceVideoStreamPlugin : FlutterPlugin, MethodCallHandler {

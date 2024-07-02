@@ -29,7 +29,9 @@ import com.example.advance_video_stream.libre_tube.response.Streams
 import com.example.advance_video_stream.network.CronetHelper
 import com.example.advance_video_stream.view_model.VideoDataVM
 import io.flutter.plugin.platform.PlatformView
+import com.example.advance_video_stream.new_pipe_extractor.NewPipeExtractorHelper
 import io.flutter.view.TextureRegistry
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
@@ -39,6 +41,8 @@ import android.view.Surface
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import okhttp3.internal.wait
+import org.schabi.newpipe.extractor.stream.StreamInfo
+import org.schabi.newpipe.extractor.stream.StreamType
 
 
 @OptIn(UnstableApi::class)
@@ -49,6 +53,8 @@ class NativeView(context: Context, id: Int, creationParams: Map<String?, Any?>?)
     private val exoPlayer: ExoPlayer
 
     override fun getView(): View = playerView
+
+    val videoDataVM = VideoDataVM()
 
     init {
         Log.d(TAG, "init: called")
@@ -74,31 +80,47 @@ class NativeView(context: Context, id: Int, creationParams: Map<String?, Any?>?)
     //Player vars
     private val MINIMUM_BUFFER_DURATION = 1000 * 10 // exo default is 50s
 
+
     fun updatePlayerItem(videoId: String, useHLS: Boolean = false) {
         CoroutineScope(Dispatchers.IO).launch {
-//            Log.i(TAG, "updatePlayerItem: CoroutineScope Dispatchers.IO called")
-            val getData = VideoDataVM().getData(videoId)
+
+            Log.d(TAG, "updatePlayerItem: videoId $videoId useHLS $useHLS")
+
+            NewPipeExtractorHelper.getStreamingService()
+
+            val streamingExtractor: Deferred<StreamInfo> = async {
+                return@async NewPipeExtractorHelper.getStreamInfo(videoId)
+            }
+
+            val streamUrl: StreamInfo = streamingExtractor.await()
+
+            val cronetDataSourceFactory = CronetDataSource.Factory(CronetHelper.cronetEngine, Executors.newCachedThreadPool())
+            val hlsMediaSourceFactory = HlsMediaSource.Factory(cronetDataSourceFactory).setPlaylistParserFactory(YoutubeHlsPlaylistParser.Factory())
+
+            val mediaItem = MediaItem.Builder()
+                .setUri(Uri.parse(streamUrl.hlsUrl))
+                .setMimeType("application/x-mpegURL")
+                .build()
+
+            val mediaSource = hlsMediaSourceFactory.createMediaSource(mediaItem)
+
+            MainScope().launch {
+                exoPlayer.setMediaSource(mediaSource)
+                exoPlayer.prepare()
+                playerView.initialize(streamUrl.streamType == StreamType.LIVE_STREAM, exoPlayer)
+                playerView.topBarTextVideoTitle.text = streamUrl.name
+                exoPlayer.playWhenReady = true
+            }
+
+
+            /*val getData = videoDataVM.getData(videoId, useHLS)
             getData.start()
-//            Log.i(TAG, "updatePlayerItem: CoroutineScope Dispatchers.IO getData $getData")
             val streams: Streams? = getData.await()
-//            Log.i(TAG, "updatePlayerItem: CoroutineScope Dispatchers.IO streams $streams")
-//            Log.i(TAG, "updatePlayerItem: CoroutineScope Dispatchers.IO streams hls ${streams?.hls}")
             if (streams != null) {
 
+                val mediaItem: MediaItem = videoDataVM.createMediaItem(streams, useHLS)
+
                 if (!useHLS) {
-
-                    val uri: Uri = if (streams.livestream && streams.dash != null) {
-                        ProxyHelper.unwrapStreamUrl(streams.dash).toUri()
-                    } else {
-                        val manifest: String = DashHelper.createManifest(streams, false)
-
-                        // encode to base64
-                        val encoded = Base64.encodeToString(manifest.toByteArray(), Base64.DEFAULT)
-                        Uri.parse("data:application/dash+xml;charset=utf-8;base64,$encoded")
-                    }
-
-                    val mediaItem = MediaItem.Builder().setUri(uri).setMimeType("application/dash+xml").build()
-
                     MainScope().launch {
                         exoPlayer.setMediaItem(mediaItem)
                         exoPlayer.prepare()
@@ -107,38 +129,24 @@ class NativeView(context: Context, id: Int, creationParams: Map<String?, Any?>?)
                         exoPlayer.playWhenReady = true
                     }
                 } else {
-                    //HLS
-                    val cronetDataSourceFactory = CronetDataSource.Factory(CronetHelper.cronetEngine, Executors.newCachedThreadPool())
 
+                    val cronetDataSourceFactory = CronetDataSource.Factory(CronetHelper.cronetEngine, Executors.newCachedThreadPool())
                     val hlsMediaSourceFactory = HlsMediaSource.Factory(cronetDataSourceFactory).setPlaylistParserFactory(YoutubeHlsPlaylistParser.Factory())
 
-//                    Log.i(TAG, "updatePlayerItem: CoroutineScope Dispatchers.IO else hlsUri")
-//                    Log.i(TAG, "updatePlayerItem: CoroutineScope Dispatchers.IO else proxyUri")
-//                    Log.i(TAG, "updatePlayerItem: CoroutineScope Dispatchers.IO else uriMaker")
-//                    Log.i(TAG, "updatePlayerItem: CoroutineScope Dispatchers.IO else mediaSourceCreator")
+                    val mediaSource = hlsMediaSourceFactory.createMediaSource(mediaItem)
 
-                    val mediaSourceCreator =
-                        MediaItem.Builder().setUri(Uri.parse(ProxyHelper.unwrapStreamUrl(streams.hls!!))).setMimeType("application/x-mpegURL").build()
-
-//                    Log.i(TAG, "updatePlayerItem: CoroutineScope Dispatchers.IO else createMediaSource")
-
-                    val mediaSource = hlsMediaSourceFactory.createMediaSource(mediaSourceCreator)
-
-//                    Log.i(TAG, "updatePlayerItem: CoroutineScope Dispatchers.IO else called")
                     MainScope().launch {
-//                        Log.i(TAG, "updatePlayerItem: CoroutineScope Dispatchers.IO else MainScope called")
                         exoPlayer.setMediaSource(mediaSource)
                         exoPlayer.prepare()
                         playerView.initialize(streams.livestream, exoPlayer)
                         playerView.topBarTextVideoTitle.text = streams.title
                         exoPlayer.playWhenReady = true
-//                        Log.i(TAG, "updatePlayerItem: CoroutineScope Dispatchers.IO else MainScope called post")
                     }
-
                 }
+
             } else {
                 Log.d(TAG, "createExoPlayer: CoroutineScope VideoDataVM().getData is null")
-            }
+            }*/
         }
     }
 

@@ -132,10 +132,13 @@ class CustomPlayerView(context: Context, attrs: AttributeSet?) : PlayerView(cont
         playPauseBTN.setOnClickListener {
 
             Log.d(TAG,"init playPauseBTN setOnClickListener clicked")
+            Log.d(TAG,"init playPauseBTN setOnClickListener playbackState ${player?.playbackState}")
 
-            if (player?.isPlaying == true || player?.playbackState == Player.STATE_ENDED) {
+            if (player?.isPlaying == true || player?.playbackState != Player.STATE_ENDED) {
+                Log.d(TAG,"init playPauseBTN setOnClickListener player?.isPlaying == true || player?.playbackState != Player.STATE_ENDED")
                 player?.pause()
             } else {
+                Log.d(TAG,"init playPauseBTN setOnClickListener player?.isPlaying == true || player?.playbackState == Player.STATE_ENDED (else)")
                 player?.play()
             }
         }

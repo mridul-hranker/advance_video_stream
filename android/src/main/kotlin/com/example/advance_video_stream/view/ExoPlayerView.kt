@@ -34,11 +34,18 @@ import com.example.advance_video_stream.view_model.VideoDataVM
 import io.flutter.view.TextureRegistry
 import com.example.advance_video_stream.AdvanceVideoStreamPlugin
 import android.view.Surface
+import com.example.advance_video_stream.new_pipe_extractor.NewPipeExtractorHelper
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
+import org.schabi.newpipe.extractor.stream.StreamInfo
+import org.schabi.newpipe.extractor.stream.StreamType
 
 @OptIn(UnstableApi::class)
 class ExoPlayerView(private val context: Context, private val textureEntry: TextureRegistry.SurfaceTextureEntry) {
     private val TAG = "ExoPlayerView"
     private val exoPlayer: ExoPlayer
+
+    val videoDataVM = VideoDataVM()
 
     init {
         Log.d(TAG, "init: called")
@@ -98,27 +105,46 @@ class ExoPlayerView(private val context: Context, private val textureEntry: Text
 
     fun updatePlayerItem(videoId: String, useHLS: Boolean = false) {
         CoroutineScope(Dispatchers.IO).launch {
-            val getData = VideoDataVM().getData(videoId)
+
+
+
+            Log.d(TAG, "updatePlayerItem: videoId $videoId useHLS $useHLS")
+
+            NewPipeExtractorHelper.getStreamingService()
+
+            val streamingExtractor: Deferred<StreamInfo> = async {
+                return@async NewPipeExtractorHelper.getStreamInfo(videoId)
+            }
+
+            val streamUrl: StreamInfo = streamingExtractor.await()
+
+            val cronetDataSourceFactory = CronetDataSource.Factory(CronetHelper.cronetEngine, Executors.newCachedThreadPool())
+            val hlsMediaSourceFactory = HlsMediaSource.Factory(cronetDataSourceFactory).setPlaylistParserFactory(YoutubeHlsPlaylistParser.Factory())
+
+            val mediaItem = MediaItem.Builder()
+                .setUri(Uri.parse(streamUrl.hlsUrl))
+                .setMimeType("application/x-mpegURL")
+                .build()
+
+            val mediaSource = hlsMediaSourceFactory.createMediaSource(mediaItem)
+
+            MainScope().launch {
+                exoPlayer.setMediaSource(mediaSource)
+                exoPlayer.prepare()
+//                playerView.initialize(streamUrl.streamType == StreamType.LIVE_STREAM, exoPlayer)
+//                playerView.topBarTextVideoTitle.text = streamUrl.name
+                exoPlayer.playWhenReady = true
+            }
+
+
+            /*val getData = videoDataVM.getData(videoId, useHLS)
             getData.start()
             val streams: Streams? = getData.await()
             if (streams != null) {
 
+                val mediaItem: MediaItem = videoDataVM.createMediaItem(streams, useHLS)
+
                 if (!useHLS) {
-
-                    val uri: Uri = if (streams.livestream && streams.dash != null) {
-                        ProxyHelper.unwrapStreamUrl(streams.dash).toUri()
-                    } else {
-                        val manifest: String = DashHelper.createManifest(streams, false)
-
-                        // encode to base64
-                        val encoded = Base64.encodeToString(manifest.toByteArray(), Base64.DEFAULT)
-                        Uri.parse("data:application/dash+xml;charset=utf-8;base64,$encoded")
-                    }
-
-                    val mediaItem = MediaItem.Builder()
-                        .setUri(uri)
-                        .setMimeType("application/dash+xml")
-                        .build()
 
                     MainScope().launch {
                         exoPlayer.setMediaItem(mediaItem)
@@ -131,12 +157,7 @@ class ExoPlayerView(private val context: Context, private val textureEntry: Text
 
                     val hlsMediaSourceFactory = HlsMediaSource.Factory(cronetDataSourceFactory).setPlaylistParserFactory(YoutubeHlsPlaylistParser.Factory())
 
-                    val mediaSourceCreator = MediaItem.Builder()
-                        .setUri(Uri.parse(ProxyHelper.unwrapStreamUrl(streams.hls!!)))
-                        .setMimeType("application/x-mpegURL")
-                        .build()
-
-                    val mediaSource = hlsMediaSourceFactory.createMediaSource(mediaSourceCreator)
+                    val mediaSource = hlsMediaSourceFactory.createMediaSource(mediaItem)
 
                     MainScope().launch {
                         exoPlayer.setMediaSource(mediaSource)
@@ -147,7 +168,7 @@ class ExoPlayerView(private val context: Context, private val textureEntry: Text
                 }
             } else {
                 Log.d(TAG, "createExoPlayer: CoroutineScope VideoDataVM().getData is null")
-            }
+            }*/
         }
     }
 
