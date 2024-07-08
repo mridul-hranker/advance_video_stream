@@ -65,9 +65,9 @@ class CustomPlayerView(context: Context, attrs: AttributeSet?) : PlayerView(cont
         player?.addListener(object : Player.Listener {
             override fun onEvents(player: Player, events: Player.Events) {
                 super.onEvents(player, events)
-                if (events.containsAny(Player.EVENT_PLAYBACK_STATE_CHANGED, Player.EVENT_IS_PLAYING_CHANGED, Player.EVENT_PLAY_WHEN_READY_CHANGED)) {
-                    playPauseBTN.setImageResource(getPlayPauseActionIcon(player))
 
+
+                if (events.containsAny(Player.EVENT_TRACKS_CHANGED)) {
                     if (qualityList.isEmpty()) {
                         val exoPlayerCurrentTracksList: List<VideoResolution> = exoPlayer.currentTracks.groups.asSequence().flatMap { group ->
                             (0 until group.length).map { group.getTrackFormat(it).height }
@@ -92,6 +92,12 @@ class CustomPlayerView(context: Context, attrs: AttributeSet?) : PlayerView(cont
                     }
 
                     setPlaybackSpeed()
+                }
+
+                if (events.containsAny(Player.EVENT_PLAYBACK_STATE_CHANGED, Player.EVENT_IS_PLAYING_CHANGED, Player.EVENT_PLAY_WHEN_READY_CHANGED)) {
+                    playPauseBTN.setImageResource(getPlayPauseActionIcon(player))
+
+
 
                     // keep screen on if the video is playing
 //                    keepScreenOn = player.isPlaying == true
@@ -115,7 +121,7 @@ class CustomPlayerView(context: Context, attrs: AttributeSet?) : PlayerView(cont
     }
 
     fun setPlaybackSpeed() {
-        val speedUi = speedList.map { "${String.format(Locale.ROOT," % .2f", it)}x" }
+        val speedUi = speedList.map { "${String.format(Locale.ROOT, " % .2f", it)}x" }
 
         val arrayAdapter = ArrayAdapter(context, R.layout.dropdown_item, speedUi)
         arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -131,16 +137,27 @@ class CustomPlayerView(context: Context, attrs: AttributeSet?) : PlayerView(cont
 
         playPauseBTN.setOnClickListener {
 
-            Log.d(TAG,"init playPauseBTN setOnClickListener clicked")
-            Log.d(TAG,"init playPauseBTN setOnClickListener playbackState ${player?.playbackState}")
+            Log.d(TAG, "init playPauseBTN setOnClickListener clicked")
+            Log.d(TAG, "init playPauseBTN setOnClickListener playbackState ${player?.playbackState}")
 
-            if (player?.isPlaying == true || player?.playbackState != Player.STATE_ENDED) {
-                Log.d(TAG,"init playPauseBTN setOnClickListener player?.isPlaying == true || player?.playbackState != Player.STATE_ENDED")
-                player?.pause()
+//            Log.d(TAG, "init playPauseBTN setOnClickListener player?.isPlaying == true ${player?.isPlaying == true}")
+//            Log.d(TAG, "init playPauseBTN setOnClickListener player?.playbackState != Player.STATE_ENDED ${player?.playbackState != Player.STATE_ENDED}")
+
+            if (player?.isPlaying == true) {
+//                Log.d(TAG, "init playPauseBTN setOnClickListener player?.isPlaying == true")
+                player?.playWhenReady = false
             } else {
-                Log.d(TAG,"init playPauseBTN setOnClickListener player?.isPlaying == true || player?.playbackState == Player.STATE_ENDED (else)")
-                player?.play()
+//                Log.d(TAG, "init playPauseBTN setOnClickListener player?.isPlaying != true")
+                player?.playWhenReady = true
             }
+
+
+            if (player?.playbackState == Player.STATE_ENDED) {
+//                Log.d(TAG, "init playPauseBTN setOnClickListener player?.playbackState == Player.STATE_ENDED")
+                player?.seekTo(0)
+                player?.playWhenReady = true
+            }
+
         }
 
         toggleResize.setOnClickListener {
@@ -172,7 +189,7 @@ class CustomPlayerView(context: Context, attrs: AttributeSet?) : PlayerView(cont
         val timeLeft = duration - position
 
         this.position.text = if (isLive) "Live" else DateUtils.formatElapsedTime(position)
-        this.duration.text = String.format("-%s",DateUtils.formatElapsedTime(timeLeft))
+        this.duration.text = String.format("-%s", DateUtils.formatElapsedTime(timeLeft))
         //this.duration.text = "-${DateUtils.formatElapsedTime(timeLeft)}"
 
 
@@ -204,8 +221,13 @@ class CustomPlayerView(context: Context, attrs: AttributeSet?) : PlayerView(cont
 
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
 
-        Log.d(TAG, "onItemSelected: view ${view}")
+        Log.d(TAG, "onItemSelected: view $view")
         Log.d(TAG, "onItemSelected: view?.id ${view?.id}")
+
+//        Log.d(TAG, "onItemSelected: parent?.id ${parent?.id}")
+//        Log.d(TAG, "onItemSelected: spinnerQuality.id ${spinnerQuality.id}")
+//        Log.d(TAG, "onItemSelected: parent?.id == spinnerQuality.id ${parent?.id == spinnerQuality.id}")
+//        Log.d(TAG, "onItemSelected: parent?.id == spinnerQuality.id ${parent?.id == spinnerSpeed.id}")
 
 
         if (parent?.id == spinnerQuality.id) {
@@ -218,9 +240,11 @@ class CustomPlayerView(context: Context, attrs: AttributeSet?) : PlayerView(cont
                 setMinVideoSize(Int.MIN_VALUE, resolution)
                 setMaxVideoSize(Int.MAX_VALUE, resolution)
             }
-        } else if (parent?.id == spinnerSpeed.id) {/*Log.d(TAG, "onItemSelected: view == spinnerSpeed")
-            Log.d(TAG, "onItemSelected: view == spinnerSpeed speedList[position].round(2) ${speedList[position].round(2)}")*/
+        } else if (parent?.id == spinnerSpeed.id) {
+//            Log.d(TAG, "onItemSelected: view == spinnerSpeed")
+//            Log.d(TAG, "onItemSelected: view == spinnerSpeed speedList[position].round(2) ${speedList[position].round(2)}")
             player?.setPlaybackSpeed(speedList[position].round(2))
+            player?.playbackParameters = PlaybackParameters(speedList[position].round(2))
         }
     }
 

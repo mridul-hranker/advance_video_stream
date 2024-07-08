@@ -88,31 +88,39 @@ class NativeView(context: Context, id: Int, creationParams: Map<String?, Any?>?)
 
             NewPipeExtractorHelper.getStreamingService()
 
-            val streamingExtractor: Deferred<StreamInfo> = async {
+            val streamingExtractor: Deferred<StreamInfo?> = async {
                 return@async NewPipeExtractorHelper.getStreamInfo(videoId)
             }
 
-            val streamUrl: StreamInfo = streamingExtractor.await()
+            Log.d(TAG, "updatePlayerItem: streamingExtractor $streamingExtractor")
 
-            val cronetDataSourceFactory = CronetDataSource.Factory(CronetHelper.cronetEngine, Executors.newCachedThreadPool())
-            val hlsMediaSourceFactory = HlsMediaSource.Factory(cronetDataSourceFactory).setPlaylistParserFactory(YoutubeHlsPlaylistParser.Factory())
+            val streamUrl: StreamInfo? = streamingExtractor.await()
 
-            val mediaItem = MediaItem.Builder()
-                .setUri(Uri.parse(streamUrl.hlsUrl))
-                .setMimeType("application/x-mpegURL")
-                .build()
+            if (streamUrl != null) {
 
-            val mediaSource = hlsMediaSourceFactory.createMediaSource(mediaItem)
+                Log.d(TAG, "updatePlayerItem: streamUrl $streamUrl")
 
-            MainScope().launch {
-                exoPlayer.setMediaSource(mediaSource)
-                exoPlayer.prepare()
-                playerView.initialize(streamUrl.streamType == StreamType.LIVE_STREAM, exoPlayer)
-                playerView.topBarTextVideoTitle.text = streamUrl.name
-                exoPlayer.playWhenReady = true
+                val cronetDataSourceFactory = CronetDataSource.Factory(CronetHelper.cronetEngine, Executors.newCachedThreadPool())
+                val hlsMediaSourceFactory = HlsMediaSource.Factory(cronetDataSourceFactory).setPlaylistParserFactory(YoutubeHlsPlaylistParser.Factory())
+
+                Log.d(TAG, "updatePlayerItem: streamUrl.hlsUrl ${streamUrl.hlsUrl}")
+
+                val mediaItem = MediaItem.Builder()
+                    .setUri(Uri.parse(streamUrl.hlsUrl))
+                    .setMimeType("application/x-mpegURL")
+                    .build()
+
+                val mediaSource = hlsMediaSourceFactory.createMediaSource(mediaItem)
+
+                MainScope().launch {
+                    exoPlayer.setMediaSource(mediaSource)
+                    exoPlayer.prepare()
+                    playerView.initialize(streamUrl.streamType == StreamType.LIVE_STREAM, exoPlayer)
+                    playerView.topBarTextVideoTitle.text = streamUrl.name
+                    exoPlayer.playWhenReady = true
+                }
+
             }
-
-
             /*val getData = videoDataVM.getData(videoId, useHLS)
             getData.start()
             val streams: Streams? = getData.await()
@@ -168,9 +176,13 @@ class NativeView(context: Context, id: Int, creationParams: Map<String?, Any?>?)
 
     fun getPosition(): Long = exoPlayer.currentPosition
 
-    fun pause() = exoPlayer.pause()
+    fun pause() {
+        exoPlayer.playWhenReady = false
+    }
 
-    fun play() = exoPlayer.play()
+    fun play() {
+        exoPlayer.playWhenReady = true
+    }
 
     fun setPosition(position: Long) = exoPlayer.seekTo(position)
 

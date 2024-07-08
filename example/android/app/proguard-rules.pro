@@ -14,10 +14,10 @@
 
 # Uncomment this to preserve the line number information for
 # debugging stack traces.
--keepattributes SourceFile,LineNumberTable
+#-keepattributes SourceFile,LineNumberTable
 
 # prevents obfuscation in debug logs
--dontobfuscate
+#-dontobfuscate
 
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
@@ -44,18 +44,6 @@
 -keep class org.mozilla.javascript.** { *; }
 -keep class org.mozilla.classfile.ClassFileWriter
 -dontwarn org.mozilla.javascript.tools.**
-
-## Rules for OkHttp. Copy pasted from https://github.com/square/okhttp
--dontwarn okhttp3.**
--dontwarn okio.**
-
-## See https://github.com/TeamNewPipe/NewPipe/pull/1441
--keepclassmembers class * implements java.io.Serializable {
-    static final long serialVersionUID;
-    !static !transient <fields>;
-    private void writeObject(java.io.ObjectOutputStream);
-    private void readObject(java.io.ObjectInputStream);
-}
 
 -keepattributes RuntimeVisibleAnnotations,AnnotationDefault
 

@@ -1,18 +1,16 @@
 package com.example.advance_video_stream
 
 import android.content.Context
-import android.net.Uri
 import android.os.Build
-import android.util.Base64
 import android.util.Log
-import androidx.annotation.NonNull
-import com.example.advance_video_stream.view.NativeViewFactory
+import com.example.advance_video_stream.view.CallbackListener
 import com.example.advance_video_stream.view.ExoPlayerView
+import com.example.advance_video_stream.view.NativeViewFactory
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
+import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
-import io.flutter.plugin.common.MethodChannel.Result
 import io.flutter.view.TextureRegistry
 
 /** AdvanceVideoStreamPlugin */
@@ -28,6 +26,7 @@ class AdvanceVideoStreamPlugin : FlutterPlugin, MethodCallHandler {
     /// This local reference serves to register the plugin with the Flutter Engine and unregister it
     /// when the Flutter Engine is detached from the Activity
     private lateinit var channel: MethodChannel
+    private lateinit var eventChannel: EventChannel
 
     private lateinit var textureRegistry: TextureRegistry
 
@@ -40,12 +39,14 @@ class AdvanceVideoStreamPlugin : FlutterPlugin, MethodCallHandler {
         channel.setMethodCallHandler(this)
         context = flutterPluginBinding.applicationContext
 
+        eventChannel = EventChannel(flutterPluginBinding.binaryMessenger, "advance_video_stream_event_channel")
+
         textureRegistry = flutterPluginBinding.getTextureRegistry()
 
         flutterPluginBinding.platformViewRegistry.registerViewFactory("ExoPlayer", nativeViewFactory)
     }
 
-    override fun onMethodCall(call: MethodCall, result: Result) {
+    override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         if (isEmulator) {
             Log.d(TAG, "onMethodCall: you are on Emulator")
         } else if (call.method == "getSurfacePlayer") {
@@ -55,7 +56,7 @@ class AdvanceVideoStreamPlugin : FlutterPlugin, MethodCallHandler {
 
 //            Log.d(TAG, "onMethodCall: getPlayer handle.id ${handle?.id()}")
 
-            surfacePlayer = ExoPlayerView(context!!, handle)
+            surfacePlayer = ExoPlayerView(context!!, handle, eventChannel)
 
             result.success(handle!!.id())
         } else if (call.method == "disposeSurfacePlayer") {

@@ -34,8 +34,12 @@ object NewPipeExtractorHelper {
     }
 
     //        return StreamInfo.getInfo("https://www.youtube.com/watch?v=3jPFr94OxXY")
-    fun getStreamInfo(videoId: String): StreamInfo {
-        return StreamInfo.getInfo("https://www.youtube.com/watch?v=$videoId")
+    fun getStreamInfo(videoId: String): StreamInfo? {
+        return try {
+            StreamInfo.getInfo("https://www.youtube.com/watch?v=$videoId")
+        } catch (ex: Exception) {
+            null
+        }
     }
 
 }

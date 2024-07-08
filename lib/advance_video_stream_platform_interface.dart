@@ -24,7 +24,7 @@ abstract class AdvanceVideoStreamPlatform extends PlatformInterface {
   }
 
   //Surface Player
-  SurfacePlayer getSurfacePlayer() {
+  SurfacePlayer getSurfacePlayer(double aspectRatio) {
     throw UnimplementedError('getSurfacePlayer has not been implemented.');
   }
 

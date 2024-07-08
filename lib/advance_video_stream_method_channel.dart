@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -13,8 +15,9 @@ class MethodChannelAdvanceVideoStream extends AdvanceVideoStreamPlatform {
   final methodChannel = const MethodChannel('advance_video_stream');
 
   @override
-  SurfacePlayer getSurfacePlayer() {
-    return SurfacePlayer(methodChannel: methodChannel, aspectRatio: 16 / 9);
+  SurfacePlayer getSurfacePlayer(double aspectRatio) {
+    // videoEventsFor();
+    return SurfacePlayer(methodChannel: methodChannel, aspectRatio: aspectRatio);
   }
 
   @override
@@ -34,8 +37,26 @@ class MethodChannelAdvanceVideoStream extends AdvanceVideoStreamPlatform {
 
   @override
   Future<void> setSurfacePlayerVideoData(String videoId, bool useHLS) async {
+
     await methodChannel.invokeMethod<void>('setSurfacePlayerVideoData', {"videoId": videoId, "useHLS": useHLS});
+
+    /*advanceVideoStreamEventChannel.listen((event) {
+      debugPrint("advance_video_stream_event_channel listen called");
+      debugPrint("advance_video_stream_event_channel listen event ${event.toString()}");
+    });*/
+
   }
+
+  /*late Stream<dynamic> advanceVideoStreamEventChannel;
+
+  void videoEventsFor() {
+    advanceVideoStreamEventChannel = const EventChannel("advance_video_stream_event_channel").receiveBroadcastStream().map((event) {
+      debugPrint("advance_video_stream_event_channel called");
+      debugPrint("advance_video_stream_event_channel event ${event.toString()}");
+    });
+
+
+  }*/
 
   @override
   Future<void> play() async {
