@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:advance_video_stream/advance_video_stream.dart';
-import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:flutter/material.dart';
 
 class VideoPlayerScreen extends StatefulWidget {
@@ -20,7 +19,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> with SingleTicker
 
   @override
   void didChangeDependencies() {
-    Future.delayed(Duration.zero, () => _advanceVideoStreamPlugin.setSurfacePlayerVideoData(videoId: widget.videoId, useHLS: false));
+    Future.delayed(Duration.zero, () => _advanceVideoStreamPlugin.setVideoData(videoId: widget.videoId, useHLS: false));
 
     /*Timer(const Duration(seconds: 5), () {
       _advanceVideoStreamPlugin.getPlayer().then((value) {
@@ -63,21 +62,21 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> with SingleTicker
       builder: (context, orientation) => Scaffold(
         body: AspectRatio(
           aspectRatio: MediaQuery.of(context).size.aspectRatio,
-          child: /*Stack(
+          child: Stack(
             fit: StackFit.expand,
             children: [
               _advanceVideoStreamPlugin.player(aspectRatio: MediaQuery.of(context).size.aspectRatio), //getSurfacePlayer(),
-              Row(
+              /*Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   IconButton(onPressed: () => _advanceVideoStreamPlugin.pause(), icon: const Icon(Icons.pause)),
                   IconButton(onPressed: () => _advanceVideoStreamPlugin.play(), icon: const Icon(Icons.play_arrow)),
                 ],
-              )
+              )*/
             ],
-          ),*/
-              Stack(
+          ),
+              /*Stack(
             children: [
               _advanceVideoStreamPlugin.getSurfacePlayer(aspectRatio: MediaQuery.of(context).size.aspectRatio),
               Positioned(
@@ -139,7 +138,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> with SingleTicker
                 ),
               ),
             ],
-          ),
+          ),*/
         ),
       ),
     );

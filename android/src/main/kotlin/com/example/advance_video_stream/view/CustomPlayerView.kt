@@ -61,6 +61,7 @@ class CustomPlayerView(context: Context, attrs: AttributeSet?) : PlayerView(cont
         if (isLive) {
             duration.visibility = View.GONE
         }
+        setPlaybackSpeed()
 
         player?.addListener(object : Player.Listener {
             override fun onEvents(player: Player, events: Player.Events) {
@@ -68,6 +69,7 @@ class CustomPlayerView(context: Context, attrs: AttributeSet?) : PlayerView(cont
 
 
                 if (events.containsAny(Player.EVENT_TRACKS_CHANGED)) {
+//                    Log.d(TAG, "onEvents: Player.EVENT_TRACKS_CHANGED called")
                     if (qualityList.isEmpty()) {
                         val exoPlayerCurrentTracksList: List<VideoResolution> = exoPlayer.currentTracks.groups.asSequence().flatMap { group ->
                             (0 until group.length).map { group.getTrackFormat(it).height }
@@ -89,10 +91,27 @@ class CustomPlayerView(context: Context, attrs: AttributeSet?) : PlayerView(cont
                         }*/
 
                         setVideoList(defaultTrackSelector.parameters.maxVideoHeight)
+                        spinnerQuality.isEnabled = true
                     }
 
-                    setPlaybackSpeed()
+                    spinnerSpeed.isEnabled = true
                 }
+
+                /*if (events.containsAny(Player.EVENT_PLAY_WHEN_READY_CHANGED)) {
+                    Log.d(TAG, "onEvents: Player.EVENT_PLAY_WHEN_READY_CHANGED called")
+                }
+
+                if (events.containsAny(Player.EVENT_IS_LOADING_CHANGED)) {
+                    Log.d(TAG, "onEvents: Player.EVENT_IS_LOADING_CHANGED called")
+                }
+
+                if (events.containsAny(Player.EVENT_MEDIA_METADATA_CHANGED)) {
+                    Log.d(TAG, "onEvents: Player.EVENT_MEDIA_METADATA_CHANGED called")
+                }
+
+                if (events.containsAny(Player.EVENT_METADATA)) {
+                    Log.d(TAG, "onEvents: Player.EVENT_METADATA called")
+                }*/
 
                 if (events.containsAny(Player.EVENT_PLAYBACK_STATE_CHANGED, Player.EVENT_IS_PLAYING_CHANGED, Player.EVENT_PLAY_WHEN_READY_CHANGED)) {
                     playPauseBTN.setImageResource(getPlayPauseActionIcon(player))
@@ -111,6 +130,7 @@ class CustomPlayerView(context: Context, attrs: AttributeSet?) : PlayerView(cont
         val arrayAdapter = ArrayAdapter(context, R.layout.dropdown_item, qualityList.map { it.name })
         arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerQuality.adapter = arrayAdapter
+        spinnerQuality.isEnabled = false
 
         // Spinner click listener
         spinnerQuality.onItemSelectedListener = this
@@ -126,6 +146,7 @@ class CustomPlayerView(context: Context, attrs: AttributeSet?) : PlayerView(cont
         val arrayAdapter = ArrayAdapter(context, R.layout.dropdown_item, speedUi)
         arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerSpeed.adapter = arrayAdapter
+        spinnerSpeed.isEnabled = false
 
         spinnerSpeed.onItemSelectedListener = this
 
@@ -227,7 +248,7 @@ class CustomPlayerView(context: Context, attrs: AttributeSet?) : PlayerView(cont
 //        Log.d(TAG, "onItemSelected: parent?.id ${parent?.id}")
 //        Log.d(TAG, "onItemSelected: spinnerQuality.id ${spinnerQuality.id}")
 //        Log.d(TAG, "onItemSelected: parent?.id == spinnerQuality.id ${parent?.id == spinnerQuality.id}")
-//        Log.d(TAG, "onItemSelected: parent?.id == spinnerQuality.id ${parent?.id == spinnerSpeed.id}")
+//        Log.d(TAG, "onItemSelected: parent?.id == spinnerSpeed.id ${parent?.id == spinnerSpeed.id}")
 
 
         if (parent?.id == spinnerQuality.id) {
