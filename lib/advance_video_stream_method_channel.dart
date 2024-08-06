@@ -59,17 +59,17 @@ class MethodChannelAdvanceVideoStream extends AdvanceVideoStreamPlatform {
   }*/
 
   @override
-  Future<void> play() async {
+  void play() async {
     await methodChannel.invokeMethod<void>('play');
   }
 
   @override
-  Future<void> pause() async {
+  void pause() async {
     await methodChannel.invokeMethod<void>('pause');
   }
 
   @override
-  Future<void> setVideoData(String videoId, bool useHLS) async {
+  void setVideoData(String videoId, bool useHLS) async {
     await methodChannel.invokeMethod<void>('setVideoData', {"videoId": videoId, "useHLS": useHLS});
   }
 
@@ -89,7 +89,7 @@ class MethodChannelAdvanceVideoStream extends AdvanceVideoStreamPlatform {
   }
 
   @override
-  Future<void> changeOrientation(bool isLandscape) async {
+  void changeOrientation(bool isLandscape) async {
     await methodChannel.invokeMethod<void>('changeOrientation', {"isLandscape": isLandscape});
   }
 

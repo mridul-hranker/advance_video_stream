@@ -33,15 +33,15 @@ class AdvanceVideoStream {
   }
 
   //Standard Player
-  Future<void> play() {
+  void play() {
     return AdvanceVideoStreamPlatform.instance.play();
   }
 
-  Future<void> pause() {
+  void pause() {
     return AdvanceVideoStreamPlatform.instance.pause();
   }
 
-  Future<void> setVideoData({required String videoId, bool useHLS = false}) {
+  void setVideoData({required String videoId, bool useHLS = false}) {
     return AdvanceVideoStreamPlatform.instance.setVideoData(videoId, useHLS);
   }
 
@@ -53,11 +53,11 @@ class AdvanceVideoStream {
     return AdvanceVideoStreamPlatform.instance.getCurrentPosition();
   }
 
-  Future<void> setCurrentPosition(int position) {
+  void setCurrentPosition(int position) {
     return AdvanceVideoStreamPlatform.instance.setCurrentPosition(position);
   }
 
-  Future<void> changeOrientation(bool isLandscape) async {
+  void changeOrientation(bool isLandscape) async {
     return AdvanceVideoStreamPlatform.instance.changeOrientation(isLandscape);
   }
 

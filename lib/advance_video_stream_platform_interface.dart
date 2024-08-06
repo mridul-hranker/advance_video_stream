@@ -45,11 +45,11 @@ abstract class AdvanceVideoStreamPlatform extends PlatformInterface {
   }
 
   //Standard Player
-  Future<void> play() {
+  void play() {
     throw UnimplementedError('play has not been implemented.');
   }
 
-  Future<void> pause() {
+  void pause() {
     throw UnimplementedError('pause has not been implemented.');
   }
 
@@ -61,15 +61,15 @@ abstract class AdvanceVideoStreamPlatform extends PlatformInterface {
     throw UnimplementedError('getVideoLength has not been implemented.');
   }
 
-  Future<void> setVideoData(String videoId, bool useHLS) {
+  void setVideoData(String videoId, bool useHLS) {
     throw UnimplementedError('setVideoData(String videoId, bool useHLS) has not been implemented.');
   }
 
-  Future<void> setCurrentPosition(int position) {
+  void setCurrentPosition(int position) {
     throw UnimplementedError('setCurrentPosition has not been implemented.');
   }
 
-  Future<void> changeOrientation(bool isLandscape) {
+  void changeOrientation(bool isLandscape) {
     throw UnimplementedError('changeOrientation has not been implemented.');
   }
 
