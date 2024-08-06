@@ -45,6 +45,10 @@ class AdvanceVideoStream {
     return AdvanceVideoStreamPlatform.instance.setVideoData(videoId, useHLS);
   }
 
+  Future<int?> getVideoLength() {
+    return AdvanceVideoStreamPlatform.instance.getVideoLength();
+  }
+
   Future<int?> getCurrentPosition() {
     return AdvanceVideoStreamPlatform.instance.getCurrentPosition();
   }

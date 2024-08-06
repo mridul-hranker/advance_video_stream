@@ -20,6 +20,21 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> with SingleTicker
   @override
   void didChangeDependencies() {
     Future.delayed(Duration.zero, () => _advanceVideoStreamPlugin.setVideoData(videoId: widget.videoId, useHLS: false));
+    Future.delayed(
+      const Duration(seconds: 3),
+      () => Timer.periodic(
+        const Duration(seconds: 3),
+        (timer) {
+          _advanceVideoStreamPlugin.getVideoLength().then((value) {
+            debugPrint("VideoPlayerScreen didChangeDependencies getVideoLength $value");
+            if (!(value?.isNegative ?? true)) {
+              debugPrint("VideoPlayerScreen didChangeDependencies getVideoLength $value saving");
+              timer.cancel();
+            }
+          });
+        },
+      ),
+    );
 
     /*Timer(const Duration(seconds: 5), () {
       _advanceVideoStreamPlugin.getPlayer().then((value) {
@@ -52,7 +67,12 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> with SingleTicker
 
   @override
   void deactivate() {
-    _advanceVideoStreamPlugin.disposeSurfacePlayer();
+    _advanceVideoStreamPlugin.getVideoLength().then((value) {
+      debugPrint("VideoPlayerScreen deactivate getVideoLength $value");
+
+      _advanceVideoStreamPlugin.disposeSurfacePlayer();
+    });
+
     super.deactivate();
   }
 
@@ -76,7 +96,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> with SingleTicker
               )*/
             ],
           ),
-              /*Stack(
+          /*Stack(
             children: [
               _advanceVideoStreamPlugin.getSurfacePlayer(aspectRatio: MediaQuery.of(context).size.aspectRatio),
               Positioned(

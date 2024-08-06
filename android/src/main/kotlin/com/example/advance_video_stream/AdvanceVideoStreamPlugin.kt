@@ -93,6 +93,14 @@ class AdvanceVideoStreamPlugin : FlutterPlugin, MethodCallHandler {
 //            Log.d(TAG, "onMethodCall: setVideoData useHLS ${videoData["useHLS"]}")
 
             updatePlayerItem(videoId, useHLS)
+        } else if (call.method == "getVideoLength") {
+            Log.d(TAG, "onMethodCall: getVideoLength")
+
+            val videoLength = nativeViewFactory.getVideoLength()
+
+//            Log.d(TAG, "onMethodCall: getVideoLength videoLength videoLength")
+
+            result.success(videoLength)
         } else if (call.method == "getCurrentPosition") {
             Log.d(TAG, "onMethodCall: getCurrentPosition")
 

@@ -57,6 +57,10 @@ abstract class AdvanceVideoStreamPlatform extends PlatformInterface {
     throw UnimplementedError('getCurrentPosition has not been implemented.');
   }
 
+  Future<int?> getVideoLength() {
+    throw UnimplementedError('getVideoLength has not been implemented.');
+  }
+
   Future<void> setVideoData(String videoId, bool useHLS) {
     throw UnimplementedError('setVideoData(String videoId, bool useHLS) has not been implemented.');
   }

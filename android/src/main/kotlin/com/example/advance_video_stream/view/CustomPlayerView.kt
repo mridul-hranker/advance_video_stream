@@ -126,7 +126,7 @@ class CustomPlayerView(context: Context, attrs: AttributeSet?) : PlayerView(cont
         })
     }
 
-    fun setVideoList(currentQuality: Int) {
+    private fun setVideoList(currentQuality: Int) {
         val arrayAdapter = ArrayAdapter(context, R.layout.dropdown_item, qualityList.map { it.name })
         arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerQuality.adapter = arrayAdapter
@@ -140,7 +140,7 @@ class CustomPlayerView(context: Context, attrs: AttributeSet?) : PlayerView(cont
         spinnerQuality.setSelection(qualityList.indexOf(findItem), true)
     }
 
-    fun setPlaybackSpeed() {
+    private fun setPlaybackSpeed() {
         val speedUi = speedList.map { "${String.format(Locale.ROOT, " % .2f", it)}x" }
 
         val arrayAdapter = ArrayAdapter(context, R.layout.dropdown_item, speedUi)

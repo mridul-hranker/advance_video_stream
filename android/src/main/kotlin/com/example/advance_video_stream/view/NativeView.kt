@@ -174,6 +174,8 @@ class NativeView(context: Context, id: Int, creationParams: Map<String?, Any?>?)
     private val bufferingGoal: Int
         get() = ("80").toInt() * 1000
 
+    fun getVideoLength(): Long = exoPlayer.contentDuration
+
     fun getPosition(): Long = exoPlayer.currentPosition
 
     fun pause() {

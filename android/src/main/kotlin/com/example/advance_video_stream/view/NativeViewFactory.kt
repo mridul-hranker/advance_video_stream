@@ -24,6 +24,8 @@ class NativeViewFactory : PlatformViewFactory(StandardMessageCodec.INSTANCE) {
 
     fun play() = nativeView.play()
 
+    fun getVideoLength(): Long = nativeView.getVideoLength()
+
     fun getPosition(): Long = nativeView.getPosition()
 
     fun setPosition(position: Long) = nativeView.setPosition(position)

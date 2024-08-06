@@ -74,6 +74,11 @@ class MethodChannelAdvanceVideoStream extends AdvanceVideoStreamPlatform {
   }
 
   @override
+  Future<int?> getVideoLength() async {
+    return await methodChannel.invokeMethod<int>('getVideoLength');
+  }
+
+  @override
   Future<int?> getCurrentPosition() async {
     return await methodChannel.invokeMethod<int>('getCurrentPosition');
   }
