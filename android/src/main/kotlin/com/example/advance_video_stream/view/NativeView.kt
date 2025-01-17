@@ -96,9 +96,10 @@ class NativeView(context: Context, id: Int, creationParams: Map<String?, Any?>?)
 
             val streamUrl: StreamInfo? = streamingExtractor.await()
 
-            if (streamUrl != null) {
 
-                Log.d(TAG, "updatePlayerItem: streamUrl $streamUrl")
+            Log.d(TAG, "updatePlayerItem: streamUrl $streamUrl")
+
+            if (streamUrl != null) {
 
                 val cronetDataSourceFactory = CronetDataSource.Factory(CronetHelper.cronetEngine, Executors.newCachedThreadPool())
                 val hlsMediaSourceFactory = HlsMediaSource.Factory(cronetDataSourceFactory).setPlaylistParserFactory(YoutubeHlsPlaylistParser.Factory())

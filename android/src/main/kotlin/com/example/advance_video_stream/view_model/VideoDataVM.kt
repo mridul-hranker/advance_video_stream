@@ -2,6 +2,7 @@ package com.example.advance_video_stream.view_model
 
 import android.net.Uri
 import android.util.Base64
+import android.util.Log
 import androidx.core.net.toUri
 import androidx.media3.common.MediaItem
 import com.example.advance_video_stream.libre_tube.ProxyHelper
@@ -11,11 +12,13 @@ import com.example.advance_video_stream.repo.VideoDataRepo
 import kotlinx.coroutines.Deferred
 
 class VideoDataVM(private val repository: VideoDataRepo = VideoDataRepo) {
+    companion object {
+        private const val TAG = "VideoDataVM"
+    }
+
 
     suspend fun getData(videoId: String, useHLS: Boolean): Deferred<Streams?> {
         return repository.getData(videoId)
-
-
 
 
     }
@@ -28,6 +31,19 @@ class VideoDataVM(private val repository: VideoDataRepo = VideoDataRepo) {
                 ProxyHelper.unwrapStreamUrl(streams.dash).toUri()
             } else {
                 val manifest: String = DashHelper.createManifest(streams, false)
+
+
+                Log.i(TAG, "updatePlayerItem: CoroutineScope Dispatchers.IO if createMediaSource manifest start")
+
+                val maxLogSize = 1000
+                for (i in 0..(manifest.length / maxLogSize)) {
+                    val start = i * maxLogSize
+                    var end = (i + 1) * maxLogSize
+                    end = if (end > manifest.length) manifest.length else end
+                    Log.v(TAG, manifest.substring(start, end))
+                }
+
+                Log.i(TAG, "updatePlayerItem: CoroutineScope Dispatchers.IO if createMediaSource manifest start")
 
                 // encode to base64
                 val encoded = Base64.encodeToString(manifest.toByteArray(), Base64.DEFAULT)

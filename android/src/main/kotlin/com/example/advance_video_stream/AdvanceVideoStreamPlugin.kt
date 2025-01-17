@@ -47,7 +47,7 @@ class AdvanceVideoStreamPlugin : FlutterPlugin, MethodCallHandler {
     }
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
-        if (isEmulator) {
+        if (false) {
             Log.d(TAG, "onMethodCall: you are on Emulator")
         } else if (call.method == "getSurfacePlayer") {
             Log.d(TAG, "onMethodCall: getPlayer")
