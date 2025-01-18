@@ -17,6 +17,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> with SingleTicker
 
   int? getPlayerTextureId;
 
+
   @override
   void didChangeDependencies() {
     Future.delayed(Duration.zero, () => _advanceVideoStreamPlugin.setVideoData(videoId: widget.videoId, useHLS: false));

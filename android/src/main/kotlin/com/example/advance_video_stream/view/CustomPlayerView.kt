@@ -116,8 +116,6 @@ class CustomPlayerView(context: Context, attrs: AttributeSet?) : PlayerView(cont
                 if (events.containsAny(Player.EVENT_PLAYBACK_STATE_CHANGED, Player.EVENT_IS_PLAYING_CHANGED, Player.EVENT_PLAY_WHEN_READY_CHANGED)) {
                     playPauseBTN.setImageResource(getPlayPauseActionIcon(player))
 
-
-
                     // keep screen on if the video is playing
 //                    keepScreenOn = player.isPlaying == true
 //                    onPlayerEvent(player, events)
@@ -199,7 +197,6 @@ class CustomPlayerView(context: Context, attrs: AttributeSet?) : PlayerView(cont
         }
 
 //        this.setBackgroundColor(Color.valueOf(0.0F, 0.0F,0.0F).toArgb())
-        this.setBackgroundColor(android.R.color.black)
 
         updateCurrentPosition()
     }

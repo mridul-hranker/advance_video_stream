@@ -38,6 +38,7 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import java.util.concurrent.Executors
 import android.view.Surface
+import android.widget.LinearLayout
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import okhttp3.internal.wait
@@ -50,15 +51,26 @@ class NativeView(context: Context, id: Int, creationParams: Map<String?, Any?>?)
     private val TAG = "NativeView"
 
     private val playerView: CustomPlayerView
+    private val loadingView: LinearLayout
     private val exoPlayer: ExoPlayer
+    private var isLoading: Boolean = true
 
-    override fun getView(): View = playerView
+    override fun getView(): View {
+        Log.d(TAG, "getView: isLoading $isLoading")
+        return playerView
+        /*if (isLoading) {
+            loadingView
+        } else {
+            playerView
+        }*/
+    }
 
     val videoDataVM = VideoDataVM()
 
     init {
         Log.d(TAG, "init: called")
         playerView = LayoutInflater.from(context).inflate(R.layout.custom_exo_player, null) as CustomPlayerView
+        loadingView = LayoutInflater.from(context).inflate(R.layout.loading_view, null) as LinearLayout
 
         val cronetDataSourceFactory = CronetDataSource.Factory(CronetHelper.cronetEngine, Executors.newCachedThreadPool())
         val dataSourceFactory = DefaultDataSource.Factory(context, cronetDataSourceFactory)
@@ -77,12 +89,10 @@ class NativeView(context: Context, id: Int, creationParams: Map<String?, Any?>?)
         Log.d(TAG, "dispose: called")
     }
 
-    //Player vars
-    private val MINIMUM_BUFFER_DURATION = 1000 * 10 // exo default is 50s
-
 
     fun updatePlayerItem(videoId: String, useHLS: Boolean = false) {
         CoroutineScope(Dispatchers.IO).launch {
+            isLoading = true
 
             Log.d(TAG, "updatePlayerItem: videoId $videoId useHLS $useHLS")
 
@@ -95,7 +105,6 @@ class NativeView(context: Context, id: Int, creationParams: Map<String?, Any?>?)
             Log.d(TAG, "updatePlayerItem: streamingExtractor $streamingExtractor")
 
             val streamUrl: StreamInfo? = streamingExtractor.await()
-
 
             Log.d(TAG, "updatePlayerItem: streamUrl $streamUrl")
 
@@ -114,6 +123,9 @@ class NativeView(context: Context, id: Int, creationParams: Map<String?, Any?>?)
                 val mediaSource = hlsMediaSourceFactory.createMediaSource(mediaItem)
 
                 MainScope().launch {
+                    Log.d(TAG, "updatePlayerItem: isLoading $isLoading")
+                    isLoading = false
+                    Log.d(TAG, "updatePlayerItem: isLoading $isLoading")
                     exoPlayer.setMediaSource(mediaSource)
                     exoPlayer.prepare()
                     playerView.initialize(streamUrl.streamType == StreamType.LIVE_STREAM, exoPlayer)
