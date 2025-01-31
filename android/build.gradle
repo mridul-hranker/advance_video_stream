@@ -79,7 +79,7 @@ android {
         implementation "androidx.media3:media3-datasource-cronet:$exoplayer_version"
 
         //NewPipe
-        implementation "com.github.TeamNewPipe:NewPipeExtractor:v0.24.3"
+        implementation "com.github.TeamNewPipe:NewPipeExtractor:v0.24.4"
 //        implementation 'com.github.FireMasterK.NewPipeExtractor:NewPipeExtractor:e45fa4d37f809a07dd5bdf6f920adabe0077704f'
 //        implementation 'rocks.kavin:reqwest4j:1.0.14'
 
